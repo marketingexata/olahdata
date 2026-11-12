@@ -1,0 +1,1361 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Olah Data List Nama</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root {
+  --bg: #faf7f2;
+  --cd: #ffffff;
+  --tx: #1e2235;
+  --mu: #6e748a;
+  --pr: #e85d3f;
+  --pr-h: #d44d30;
+  --pl: #fff1ed;
+  --ok: #0f9668;
+  --ol: #ebf9f3;
+  --wn: #d97706;
+  --wl: #fef6e6;
+  --pu: #7c4dff;
+  --pul: #f2edff;
+  --bd: #ebe4da;
+  --bd-s: #dfd5c7;
+  --sh-sm: 0 2px 8px -2px rgba(30, 34, 53, 0.05), 0 1px 3px -1px rgba(30, 34, 53, 0.03);
+  --sh-md: 0 12px 32px -8px rgba(30, 34, 53, 0.07), 0 4px 12px -4px rgba(30, 34, 53, 0.04);
+  --sh-pr: 0 8px 20px -4px rgba(232, 93, 63, 0.32);
+  color-scheme: light;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+* { box-sizing: border-box; }
+html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+
+body {
+  margin: 0;
+  background-color: var(--bg);
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(255, 228, 214, 0.55) 0px, transparent 50%),
+    radial-gradient(at 100% 15%, rgba(224, 242, 254, 0.55) 0px, transparent 50%),
+    radial-gradient(at 50% 100%, rgba(243, 232, 255, 0.5) 0px, transparent 50%);
+  background-attachment: fixed;
+  color: var(--tx);
+  font: 14.5px/1.55 'Plus Jakarta Sans', system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Lineart SVG Defaults */
+.ico {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+.ico-lg { width: 22px; height: 22px; stroke-width: 1.75; }
+.ico-sm { width: 15px; height: 15px; stroke-width: 1.85; }
+
+/* Header & Hero */
+header {
+  padding: 20px 18px 6px;
+  max-width: 1040px;
+  margin: auto;
+}
+.hero {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #1e2235 0%, #2d324d 58%, #3a3252 100%);
+  color: #fff;
+  border-radius: 24px;
+  padding: 24px 26px;
+  box-shadow: 0 16px 36px -10px rgba(30, 34, 53, 0.22);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.hero::before {
+  content: "";
+  position: absolute;
+  right: -40px;
+  top: -60px;
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(232, 93, 63, 0.28) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-main {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.brand-mark {
+  width: 48px;
+  height: 48px;
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  display: grid;
+  place-items: center;
+  color: #ff9b85;
+  flex-shrink: 0;
+  backdrop-filter: blur(6px);
+}
+h1 {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+header p {
+  margin: 4px 0 0;
+  font-size: 13.5px;
+  color: rgba(255, 255, 255, 0.78);
+}
+#sv {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #a7f3d0;
+  border-radius: 999px;
+  padding: 6px 13px;
+  backdrop-filter: blur(4px);
+  white-space: nowrap;
+}
+#sv:empty { display: none; }
+
+main {
+  max-width: 1040px;
+  margin: auto;
+  padding: 8px 18px 110px;
+}
+
+/* Stepper Navigation */
+.steps {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(110px, 1fr));
+  gap: 10px;
+  overflow-x: auto;
+  padding: 12px 2px 14px;
+  scrollbar-width: none;
+}
+.steps::-webkit-scrollbar { display: none; }
+
+.st {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  border-radius: 16px;
+  background: var(--cd);
+  border: 1px solid var(--bd);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--mu);
+  cursor: pointer;
+  transition: all 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: var(--sh-sm);
+  user-select: none;
+}
+.st:hover {
+  transform: translateY(-2px);
+  border-color: var(--bd-s);
+  color: var(--tx);
+}
+.st-badge {
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+  background: var(--bg);
+  border: 1px solid var(--bd);
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--mu);
+  flex-shrink: 0;
+  transition: all 0.22s ease;
+}
+.st-meta {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  line-height: 1.25;
+}
+.st-sub {
+  font-size: 10.5px;
+  font-weight: 500;
+  opacity: 0.72;
+}
+.st.on {
+  background: var(--cd);
+  color: var(--tx);
+  border-color: var(--pr);
+  box-shadow: 0 8px 22px -6px rgba(232, 93, 63, 0.2);
+}
+.st.on .st-badge {
+  background: var(--pr);
+  border-color: var(--pr);
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(232, 93, 63, 0.3);
+}
+.st.dn {
+  color: var(--tx);
+  border-color: #bfe8d7;
+  background: linear-gradient(to right, #ffffff, #f5fcf9);
+}
+.st.dn .st-badge {
+  background: var(--ol);
+  border-color: #9ce0c5;
+  color: var(--ok);
+}
+
+/* Cards */
+.card {
+  background: var(--cd);
+  border: 1px solid var(--bd);
+  border-radius: 22px;
+  padding: 24px;
+  margin: 14px 0;
+  box-shadow: var(--sh-md);
+  animation: up 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes up {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--pl);
+  color: var(--pr);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+.card h2 {
+  margin: 0;
+  font-size: 17.5px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+.card h3 {
+  margin: 0 0 14px;
+  font-size: 15.5px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.mu {
+  color: var(--mu);
+  font-size: 13px;
+  margin: 2px 0 0;
+}
+
+/* Step 1: 3-Column Bento Upload Cards (Strict Box Containment) */
+.ready-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 600;
+  background: #f5f0e8;
+  color: var(--mu);
+  border: 1px solid var(--bd);
+}
+.ready-pill.done {
+  background: var(--ol);
+  color: var(--ok);
+  border-color: #a7e9ce;
+}
+
+.upload-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  align-items: stretch;
+  width: 100%;
+}
+@media (max-width: 880px) {
+  .upload-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+label.drop {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  width: 100%;
+  min-width: 0;
+  border: 1.5px dashed #d5c7b4;
+  border-radius: 18px;
+  padding: 18px;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  background: #fcfaf7;
+  overflow: hidden;
+}
+label.drop:hover, label.drop.drag {
+  border-color: var(--pr);
+  border-style: solid;
+  background: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px -8px rgba(232, 93, 63, 0.15);
+}
+label.drop.ok {
+  border: 1.5px solid #b7ebd4;
+  background: #ffffff;
+  box-shadow: 0 6px 20px -6px rgba(15, 150, 104, 0.08);
+}
+label.drop.ok:hover {
+  border-color: var(--ok);
+  box-shadow: 0 12px 26px -8px rgba(15, 150, 104, 0.16);
+}
+label.drop input[type=file] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+  z-index: 3;
+}
+
+.drop-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+  margin-bottom: 14px;
+}
+.drop-icon-wrap {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: #fff;
+  border: 1px solid var(--bd);
+  color: var(--pr);
+  flex-shrink: 0;
+}
+label.drop[data-slot="s"] .drop-icon-wrap { color: #2563eb; background: #eff6ff; border-color: #bfdbfe; }
+label.drop[data-slot="m"] .drop-icon-wrap { color: #0f9668; background: #ebf9f3; border-color: #a7f3d0; }
+label.drop[data-slot="t"] .drop-icon-wrap { color: #d97706; background: #fef6e6; border-color: #fde68a; }
+
+.drop-step-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #f2ece3;
+  color: var(--mu);
+  flex-shrink: 0;
+}
+label.drop.ok .drop-step-tag {
+  background: var(--ol);
+  color: var(--ok);
+}
+
+.drop-body {
+  width: 100%;
+  min-width: 0;
+  margin-bottom: 14px;
+}
+.drop-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--tx);
+  margin: 0 0 4px;
+}
+.drop-sub {
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: var(--mu);
+  margin: 0;
+  min-height: 35px;
+}
+
+/* File Slot Box inside Card */
+.drop-filebox {
+  width: 100%;
+  min-width: 0;
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: #f5f1ea;
+  border: 1px solid #e6ddd0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: auto;
+  margin-bottom: 10px;
+  transition: border-color 0.18s ease, background 0.18s ease;
+}
+label.drop:hover .drop-filebox {
+  background: var(--pl);
+  border-color: #ffcabd;
+}
+label.drop.ok .drop-filebox {
+  background: #f8faf9;
+  border-color: #d8eee4;
+}
+.drop-filebox-ico {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #fff;
+  border: 1px solid rgba(30, 34, 53, 0.07);
+  display: grid;
+  place-items: center;
+  color: var(--mu);
+  flex-shrink: 0;
+}
+label.drop.ok .drop-filebox-ico {
+  background: var(--ol);
+  border-color: #b7ebd4;
+  color: var(--ok);
+}
+.drop-filebox-info {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+}
+.drop-filename {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--tx);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.drop-hint {
+  display: block;
+  font-size: 11px;
+  color: var(--mu);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Summary Footer inside Card */
+.drop-summary {
+  width: 100%;
+  min-width: 0;
+  min-height: 52px;
+  padding: 9px 12px;
+  border-radius: 11px;
+  font-size: 12px;
+  line-height: 1.4;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f3efe8;
+  color: var(--mu);
+}
+.drop-summary span {
+  min-width: 0;
+  flex: 1;
+  word-break: break-word;
+}
+label.drop.ok .drop-summary {
+  background: var(--ol);
+  color: #0b7a53;
+}
+
+/* General Grid */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+}
+
+/* Forms & Buttons */
+button, select, input[type=text] {
+  font: inherit;
+  color: var(--tx);
+}
+button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--pr);
+  color: #fff;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  padding: 10px 18px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13.5px;
+  transition: all 0.18s ease;
+  box-shadow: var(--sh-pr);
+}
+button:hover:not(:disabled) {
+  background: var(--pr-h);
+  transform: translateY(-1px);
+}
+button:active:not(:disabled) {
+  transform: translateY(0);
+}
+button.g {
+  background: #f6f2ec;
+  color: var(--tx);
+  border-color: var(--bd);
+  box-shadow: none;
+}
+button.g:hover:not(:disabled) {
+  background: #ece5db;
+  border-color: var(--bd-s);
+}
+button:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.field-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--mu);
+  margin-bottom: 6px;
+}
+input[type=text], select {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1.5px solid var(--bd);
+  background: #fcfaf7;
+  font-size: 13.5px;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+input[type=text]:focus, select:focus {
+  outline: 0;
+  background: #fff;
+  border-color: var(--pr);
+  box-shadow: 0 0 0 3px rgba(232, 93, 63, 0.12);
+}
+
+.search-wrap {
+  position: relative;
+  margin: 12px 0;
+}
+.search-wrap .ico {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--mu);
+  pointer-events: none;
+}
+.search-wrap input[type=text] {
+  padding-left: 40px;
+}
+
+/* Column Checklist */
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 18px 0 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--bd);
+}
+.toolbar-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.badge-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--pl);
+  color: var(--pr);
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.cols {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(215px, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+  max-height: 360px;
+  overflow: auto;
+  padding: 4px 2px;
+}
+.cols label {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 9px 12px;
+  border: 1px solid var(--bd);
+  border-radius: 12px;
+  font-size: 13px;
+  background: #fdfcfb;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.cols label:hover {
+  border-color: var(--bd-s);
+  background: #fff;
+}
+.cols input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--pr);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.cols label.lk {
+  background: var(--pl);
+  border-color: #ffd5c9;
+  font-weight: 600;
+}
+.col-code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: rgba(30, 34, 53, 0.06);
+  color: var(--tx);
+}
+
+/* Step 3: Name Matching */
+.tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 14px 0;
+  padding: 5px;
+  background: #f5f0e8;
+  border-radius: 14px;
+}
+.tabs button {
+  flex: 1;
+  min-width: 130px;
+  background: transparent;
+  color: var(--mu);
+  padding: 8px 12px;
+  font-size: 13px;
+  border-radius: 10px;
+  box-shadow: none;
+  border: none;
+}
+.tabs button:hover {
+  color: var(--tx);
+  background: rgba(255, 255, 255, 0.5);
+  transform: none;
+}
+.tabs button.on {
+  background: var(--cd);
+  color: var(--tx);
+  box-shadow: var(--sh-sm);
+}
+.tab-num {
+  font-size: 11.5px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: rgba(30, 34, 53, 0.07);
+  color: inherit;
+}
+.tabs button.on .tab-num {
+  background: var(--pl);
+  color: var(--pr);
+}
+
+.it {
+  border: 1px solid var(--bd);
+  border-radius: 16px;
+  padding: 14px 16px;
+  margin: 10px 0;
+  display: grid;
+  gap: 10px;
+  background: #fff;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+.it:hover {
+  border-color: var(--bd-s);
+  box-shadow: var(--sh-sm);
+}
+.it-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.it-name {
+  font-weight: 700;
+  font-size: 14.5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.row-pill {
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: #f3efe8;
+  color: var(--mu);
+}
+.sg {
+  background: var(--wl);
+  border: 1px solid #f9e3b8;
+  border-radius: 12px;
+  padding: 9px 12px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  font-size: 13px;
+}
+.sg-match {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: #fde6b8;
+  color: #92400e;
+}
+.sg button {
+  padding: 6px 14px;
+  margin-left: auto;
+  font-size: 12.5px;
+  border-radius: 9px;
+}
+
+/* Scoped strictly to span.ok so it never collides with label.drop.ok */
+span.ok {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ok);
+  font-size: 12.5px;
+  font-weight: 600;
+  background: var(--ol);
+  padding: 4px 10px;
+  border-radius: 999px;
+  width: fit-content;
+}
+.wn { color: var(--wn); }
+
+/* Step 4: Bento Stats & Tables */
+.stat {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin: 14px 0 4px;
+}
+.stat-box {
+  position: relative;
+  border-radius: 16px;
+  padding: 16px;
+  text-align: left;
+  font-size: 12.5px;
+  font-weight: 600;
+  background: #fff4f1;
+  border: 1px solid rgba(232, 93, 63, 0.15);
+  color: var(--mu);
+  overflow: hidden;
+}
+.stat-box b {
+  display: block;
+  font-size: 24px;
+  font-weight: 700;
+  color: #d94625;
+  margin-bottom: 2px;
+  letter-spacing: -0.02em;
+}
+.stat-box .stat-ico {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  opacity: 0.22;
+  color: #d94625;
+}
+.stat-box:nth-child(6n+2) { background: #eefbf5; border-color: rgba(15, 150, 104, 0.16); }
+.stat-box:nth-child(6n+2) b, .stat-box:nth-child(6n+2) .stat-ico { color: #0d8a5e; }
+.stat-box:nth-child(6n+3) { background: #eff6ff; border-color: rgba(59, 111, 224, 0.16); }
+.stat-box:nth-child(6n+3) b, .stat-box:nth-child(6n+3) .stat-ico { color: #2b5fd9; }
+.stat-box:nth-child(6n+4) { background: var(--pul); border-color: rgba(124, 77, 255, 0.16); }
+.stat-box:nth-child(6n+4) b, .stat-box:nth-child(6n+4) .stat-ico { color: var(--pu); }
+.stat-box:nth-child(6n+5) { background: var(--wl); border-color: rgba(217, 119, 6, 0.18); }
+.stat-box:nth-child(6n+5) b, .stat-box:nth-child(6n+5) .stat-ico { color: var(--wn); }
+.stat-box:nth-child(6n) { background: #f3f4f6; border-color: #e5e7eb; }
+.stat-box:nth-child(6n) b, .stat-box:nth-child(6n) .stat-ico { color: var(--tx); }
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 13px;
+}
+th {
+  position: sticky;
+  top: 0;
+  background: #f9f6f0;
+  color: var(--mu);
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--bd);
+  text-align: left;
+  z-index: 1;
+}
+td {
+  padding: 9px 12px;
+  border-bottom: 1px solid #f2ece3;
+  text-align: left;
+}
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #fcfaf7; }
+
+.sc {
+  max-height: 310px;
+  overflow: auto;
+  border: 1px solid var(--bd);
+  border-radius: 14px;
+}
+.pu {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #e9d8fd;
+  color: #44337a;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+/* Bottom Floating Navigation */
+.nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.86);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid var(--bd);
+  padding: 12px 18px calc(12px + env(safe-area-inset-bottom, 0px));
+  z-index: 8;
+}
+.nav-inner {
+  max-width: 1040px;
+  margin: auto;
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Toast Notification */
+#toast {
+  position: fixed;
+  top: calc(16px + env(safe-area-inset-top, 0px));
+  left: 50%;
+  transform: translateX(-50%) translateY(-10px);
+  background: #1e2235;
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  opacity: 0;
+  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+  z-index: 99;
+  max-width: 90%;
+  box-shadow: 0 10px 25px -5px rgba(30, 34, 53, 0.3);
+}
+#toast.on {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Export Box */
+.export-box {
+  background: linear-gradient(135deg, #fff9f6 0%, #fff 100%);
+  border: 1px solid #f7d9d0;
+  border-radius: 18px;
+  padding: 20px;
+  margin-top: 14px;
+}
+
+@media (max-width: 640px) {
+  .hero { padding: 18px; }
+  .card { padding: 18px; }
+  .steps { grid-template-columns: repeat(5, minmax(125px, 1fr)); }
+}
+
+/* Paging langkah 3 & editor langkah 4 */
+.pager{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:12px 0}
+.pager-info{font-size:12.5px;font-weight:600;color:var(--mu)}
+.sc.tall{max-height:520px}
+th.ta,td.ta{text-align:right;width:1%;white-space:nowrap}
+button.sm{padding:5px 12px;font-size:12.5px;border-radius:9px;gap:6px}
+.ed-row td,.ed-row:hover td{background:#fcfaf7;padding:10px 12px}
+.ed{display:grid;gap:8px}
+.ed-in{display:flex;gap:8px;flex-wrap:wrap}
+.ed-in input{flex:1;min-width:200px}
+
+/* Riwayat: simpan & muat */
+.hero-act{display:flex;align-items:center;gap:8px;flex-wrap:wrap;position:relative}
+button.hbtn,label.hbtn{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:7px 14px;font-size:12.5px;font-weight:600;cursor:pointer;box-shadow:none;transition:background .18s}
+button.hbtn:hover:not(:disabled),label.hbtn:hover{background:rgba(255,255,255,.24);transform:none;box-shadow:none}
+.md{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(30,34,53,.45);backdrop-filter:blur(3px)}
+.md[hidden]{display:none}
+.md-box{width:100%;max-width:460px;background:var(--cd);border-radius:20px;padding:22px;box-shadow:var(--sh-md);display:grid;gap:10px}
+.md-box h3{margin:0;font-size:17px}
+.md-box p{margin:0}
+.md-act{display:flex;gap:8px;justify-content:flex-end;margin-top:4px}
+
+/* Stepper membeku di atas */
+.steps{position:sticky;top:env(safe-area-inset-top,0px);z-index:7;margin:0 -18px;padding:12px 18px 14px;background:rgba(250,247,242,.93);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+
+/* Panel daftar LPK langkah 3: atas beku, tengah scroll, bawah beku */
+.lpk-panel{display:flex;flex-direction:column;height:clamp(360px,calc(100vh - 330px),780px);height:clamp(360px,calc(100dvh - 330px),780px);border:1px solid var(--bd);border-radius:16px;background:#fff;overflow:hidden;margin-top:12px}
+.lpk-top{flex:none;padding:0 12px 2px;background:#fcfaf7;border-bottom:1px solid var(--bd)}
+.lpk-top .tabs{margin:10px 0 8px}
+.lpk-top .search-wrap{margin:0 0 10px}
+.lpk-scroll{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:2px 12px 6px}
+.lpk-panel .pager{flex:none;margin:0;padding:10px 12px;border-top:1px solid var(--bd);background:#fcfaf7}
+.pager-btns{display:flex;gap:8px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hero">
+    <div class="hero-main">
+      <div class="brand-mark" aria-hidden="true">
+        <svg class="ico ico-lg" viewBox="0 0 24 24">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <path d="M14 2v6h6"/>
+          <path d="M8 13h8"/>
+          <path d="M8 17h5"/>
+          <path d="M19 3l1 2 2 1-2 1-1 2-1-2-2-1 2-1 1-2z"/>
+        </svg>
+      </div>
+      <div>
+        <h1>Olah Data List Nama</h1>
+        <p>Proses olah data full offline, langsung jadi dan siap di unduh.</p>
+      </div>
+    </div>
+    <div class="hero-act">
+      <span id="sv"></span>
+      <button class="hbtn" id="hs" type="button"><svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Simpan riwayat</button>
+      <label class="hbtn" for="hf"><svg class="ico ico-sm" viewBox="0 0 24 24"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.94 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"/></svg> Muat riwayat</label>
+      <input type="file" id="hf" accept=".json,application/json" hidden>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="steps" id="steps"></div>
+  <div id="v"></div>
+</main>
+
+<div class="nav">
+  <div class="nav-inner">
+    <button class="g" id="bk">
+      <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+      Kembali
+    </button>
+    <button class="g" id="rs">
+      <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+      Mulai ulang
+    </button>
+    <button id="nx">
+      Lanjut
+      <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+    </button>
+  </div>
+</div>
+
+<div id="toast"></div>
+<div class="md" id="md" hidden>
+  <div class="md-box" role="dialog" aria-modal="true" aria-labelledby="mt">
+    <h3 id="mt">Simpan riwayat</h3>
+    <p class="mu">Beri nama file riwayatmu. Nanti file ini bisa dimuat lagi lewat tombol <b>Muat riwayat</b>.</p>
+    <input type="text" id="mn" placeholder="Nama file riwayat" autocomplete="off">
+    <p class="mu" id="mi"></p>
+    <div class="md-act"><button class="g" id="mx" type="button">Batal</button><button id="mc" type="button">Unduh riwayat</button></div>
+  </div>
+</div>
+<datalist id="moul"></datalist>
+
+<script>
+const $=s=>document.querySelector(s),E=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const S={step:0,fn:'Hasil_MOU_LPK',sel:{},lpkCol:0,namaCol:0,dec:{},nm:{},tab:'sug',q:'',pg:0},F={};
+let SEC=[],ws,hdr=[],rows=[],mou=[],src=new Set(),srcInfo='',cache=null,R=null;
+const NAMES=['Impor','UMUM','Nama LPK','Pecah','Unduh'];
+
+// Koleksi Simple Lineart SVG
+const IC={
+  check:`<svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>`,
+  checkCircle:`<svg class="ico ico-lg" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>`,
+  cloudOk:`<svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/><path d="m9 13 2 2 4-4"/></svg>`,
+  upload:`<svg class="ico" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>`,
+  file:`<svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`,
+  cols:`<svg class="ico" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>`,
+  match:`<svg class="ico" viewBox="0 0 24 24"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><path d="M11 18H8a2 2 0 0 1-2-2V9"/></svg>`,
+  split:`<svg class="ico" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>`,
+  dl:`<svg class="ico" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`,
+  src:`<svg class="ico ico-lg" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/></svg>`,
+  mou:`<svg class="ico ico-lg" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>`,
+  tgt:`<svg class="ico ico-lg" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>`,
+  search:`<svg class="ico" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>`,
+  spark:`<svg class="ico ico-sm" viewBox="0 0 24 24"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3Z"/></svg>`,
+  table:`<svg class="ico ico-sm" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>`,
+  info:`<svg class="ico ico-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`,
+  prev:`<svg class="ico ico-sm" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>`,
+  next:`<svg class="ico ico-sm" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>`,
+  edit:`<svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>`
+};
+
+const cn=i=>{let s='';for(;i>0;i=Math.floor((i-1)/26))s=String.fromCharCode(65+(i-1)%26)+s;return s};
+const nz=s=>String(s).toLowerCase().replace(/\s+/g,' ').trim();
+const toast=t=>{const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('on'),2600)};
+const idb=()=>new Promise((a,b)=>{const q=indexedDB.open('moudash',1);q.onupgradeneeded=()=>q.result.createObjectStore('kv');q.onsuccess=()=>a(q.result);q.onerror=()=>b(q.error)});
+const put=async(k,v)=>{try{(await idb()).transaction('kv','readwrite').objectStore('kv').put(v,k)}catch(e){}};
+const get=async k=>{try{const d=await idb();return await new Promise(r=>{const q=d.transaction('kv').objectStore('kv').get(k);q.onsuccess=()=>r(q.result);q.onerror=()=>r()})}catch(e){}};
+const save=()=>{put('st',{step:S.step,fn:S.fn,sel:S.sel,lpkCol:S.lpkCol,namaCol:S.namaCol,dec:S.dec,nm:S.nm});$('#sv').innerHTML=IC.cloudOk+' Tersimpan'};
+const val=c=>{let v=c.value;if(v&&typeof v==='object'&&!(v instanceof Date)){v=v.result!==undefined?v.result:v.richText?v.richText.map(t=>t.text).join(''):v.text!==undefined?v.text:null;if(v&&typeof v==='object')v=null}return v};
+const pause=()=>new Promise(r=>setTimeout(r,40));
+
+// ---------- baca file ----------
+async function parse(k){
+ if(k==='t'){const w=new ExcelJS.Workbook();await w.xlsx.load(F.t.slice(0));ws=w.getWorksheet('ALL')||w.worksheets[0];hdr=[];
+  for(let c=1;c<=ws.columnCount;c++)hdr[c]=String(val(ws.getRow(1).getCell(c))??'').replace(/\s+/g,' ').trim();
+  if(!S.lpkCol)S.lpkCol=hdr.findIndex(h=>h&&h.toUpperCase()==='LPK')>0?hdr.findIndex(h=>h&&h.toUpperCase()==='LPK'):21;
+  if(!S.namaCol)S.namaCol=hdr.findIndex(h=>/NAMA CLIENT/i.test(h||''))>0?hdr.findIndex(h=>/NAMA CLIENT/i.test(h||'')):5;
+  hdr.forEach((h,c)=>{if(c&&S.sel[c]===undefined)S.sel[c]=true});loadRows()}
+ if(k==='m'){const w=XLSX.read(F.m,{type:'array'});const a=XLSX.utils.sheet_to_json(w.Sheets[w.SheetNames[0]],{header:1});const seen=new Set();mou=[];
+  (a[0]||[]).forEach((h,c)=>{if(/^NAMA/i.test(h||''))for(let r=1;r<a.length;r++){const n=String(a[r][c]??'').trim(),u=n.toUpperCase();if(n&&!seen.has(u)){seen.add(u);
+   const pr=[...n.matchAll(/\(([^)]*)\)/g)].map(x=>x[1]);mou.push({n,u,al:[n.replace(/\(.*?\)/g,' '),...pr,n].map(cl)})}}});
+  $('#moul').innerHTML=mou.map(m=>`<option value="${E(m.n)}">`).join('');cache=null}
+ if(k==='s'){const w=XLSX.read(F.s,{type:'array'});src=new Set();
+  for(const n of w.SheetNames){const a=XLSX.utils.sheet_to_json(w.Sheets[n],{header:1,raw:true});let h=-1,c=-1;
+   for(let i=0;i<Math.min(3,a.length)&&h<0;i++)(a[i]||[]).forEach((x,j)=>{if(h<0&&/^NAMA/i.test(String(x||''))&&!/KAISHA/i.test(x)){h=i;c=j}});
+   if(h<0)continue;for(let i=h+1;i<a.length;i++){const v=a[i]&&a[i][c];if(typeof v==='string'&&v.trim())src.add(nz(v))}}
+  srcInfo=w.SheetNames.length+' sheet, '+src.size.toLocaleString('id')+' nama unik'}
+ R=null}
+
+function loadRows(){rows=[];SEC=[];if(!ws)return;let cur='';for(let r=2;r<=ws.rowCount;r++){const row=ws.getRow(r);if(!row.hasValues)continue;const a=val(row.getCell(1)),nm=String(val(row.getCell(S.namaCol))??'').trim(),lp=String(val(row.getCell(S.lpkCol))??'').trim();
+ if(typeof a==='string'&&a.trim()&&isNaN(+a)&&!nm&&!lp&&row.actualCellCount<=1){cur=a.trim();SEC.push(cur);continue}
+ rows.push({r,lpk:lp,nm,sec:cur})}cache=null;R=null}
+
+// ---------- pencocokan nama ----------
+const STOP=new Set(['LPK','PT','SO','YAYASAN','DEPOK','CV','LKP']);
+const cl=s=>String(s).toUpperCase().replace(/[^A-Z0-9 ]/g,' ').split(/\s+/).filter(w=>w&&!STOP.has(w)&&!/^\d{3,}$/.test(w));
+function dice(a,b){if(a===b)return 1;if(a.length<2||b.length<2)return 0;const g=s=>{const m={};for(let i=0;i<s.length-1;i++){const k=s.substr(i,2);m[k]=(m[k]||0)+1}return m};const x=g(a),y=g(b);let n=0;for(const k in x)if(y[k])n+=Math.min(x[k],y[k]);return 2*n/(a.length+b.length-2)}
+const tm=(a,b)=>a===b||(Math.min(a.length,b.length)>=4&&(a.startsWith(b)||b.startsWith(a)))||dice(a,b)>=.8;
+function suggest(t){const T=cl(t);if(!T.length)return null;let best=0,bi=-1;mou.forEach((m,i)=>{for(const A of m.al){const j=A.join('');if(j.length<3)continue;
+ let s=dice(A.join(' '),T.join(' '));if(A.every(a=>T.some(x=>tm(a,x))))s=Math.max(s,.9+.1*Math.min(1,j.length/T.join('').length));if(s>best){best=s;bi=i}}});
+ return best>=.5?{n:mou[bi].n,s:best}:null}
+function items(){if(cache)return cache;const c=new Map(),mu=new Set(mou.map(m=>m.u));rows.forEach(r=>{if(r.lpk)c.set(r.lpk,(c.get(r.lpk)||0)+1)});
+ cache=[...c].map(([v,n])=>{const ok=mu.has(v.toUpperCase());return{v,n,ok,sg:ok?null:suggest(v)}}).sort((a,b)=>b.n-a.n);return cache}
+const stOf=i=>i.ok?'ok':S.dec[i.v]?'done':i.sg?'sug':'none';
+
+// ---------- proses pecah ----------
+function build(){const m=new Map(mou.map(x=>[x.u,x.n])),g={},um=[];let n=0;
+ rows.forEach(r=>{const nv=S.dec[r.lpk]||r.lpk,k=m.get(String(nv).trim().toUpperCase()),o={r:r.r,lpk:k||nv,nm:r.nm,pu:src.has(nz(r.nm)),sec:r.sec};
+  if(k){(g[k]=g[k]||[]).push(o);if(o.pu)n++}else um.push(o)});
+ const non=new Map();um.forEach(o=>{if(o.lpk)non.set(o.lpk,(non.get(o.lpk)||0)+1)});
+ R={g,um,names:Object.keys(g).sort((a,b)=>a.localeCompare(b)),non:[...non].sort((a,b)=>a[0].localeCompare(b[0],'id',{numeric:true,sensitivity:'base'})),purple:n,hold:rows.filter(r=>r.sec).length,chk:Object.values(g).reduce((a,b)=>a+b.length,0)+um.length===rows.length,miss:mou.filter(x=>!g[x.n]).map(x=>x.n)}}
+
+// ---------- tampilan ----------
+function steps(){
+ $('#steps').innerHTML=NAMES.map((n,i)=>`<div class="st ${i===S.step?'on':i<S.step?'dn':''}" data-s="${i}">
+   <span class="st-badge">${i<S.step?IC.check:i+1}</span>
+   <span class="st-meta"><span class="st-sub">Langkah ${i+1}</span><span>${n}</span></span>
+ </div>`).join('');
+ $('#bk').disabled=S.step===0;$('#nx').style.display=S.step===4?'none':'';$('#nx').disabled=!ready(S.step);
+}
+const ready=s=>s===0?!!(ws&&mou.length&&src.size):true;
+
+function view(){steps();const v=$('#v');
+ if(S.step===0){
+   const cards=[
+     ['s','01',IC.src,'Excel sumber','Database nama leads acuan warna ungu','Contoh: ALL NEW LEADS MOU.xlsx',src.size?srcInfo:''],
+     ['m','02',IC.mou,'Data acuan MOU','Daftar resmi nama LPK yang sudah MOU','Contoh: MOU.xlsx',mou.length?mou.length+' LPK terdaftar':''],
+     ['t','03',IC.tgt,'Data target','File utama yang akan diolah & dipecah','Contoh: OKTOBER2.xlsx',ws?'Sheet '+ws.name+': '+rows.length+' baris'+(SEC.length?' (bagian '+SEC.join(' & ')+')':'')+', '+(hdr.length-1)+' kolom':'']
+   ];
+   const doneCnt=cards.filter(c=>c[6]).length;
+   v.innerHTML=`<div class="card">
+   <div class="card-head">
+     <div class="card-title">
+       <div class="card-icon">${IC.upload}</div>
+       <div>
+         <h2>1. Impor 3 File Excel</h2>
+         <p class="mu">Ketuk kartu atau tarik file <b>.xlsx</b> ke dalamnya. Semua data diproses aman di perangkatmu.</p>
+       </div>
+     </div>
+     <span class="ready-pill ${doneCnt===3?'done':''}">${doneCnt===3?IC.check:'•'} ${doneCnt} dari 3 file siap</span>
+   </div>
+   <div class="upload-grid">
+   ${cards.map(([k,num,ic,t,desc,h,s])=>`
+     <label class="drop ${s?'ok':''}" data-slot="${k}">
+       <input type="file" accept=".xlsx" data-k="${k}">
+       <div class="drop-top">
+         <div class="drop-icon-wrap">${ic}</div>
+         <span class="drop-step-tag">${s?IC.check+' Terbaca':'File '+num}</span>
+       </div>
+       <div class="drop-body">
+         <div class="drop-title">${t}</div>
+         <p class="drop-sub">${desc}</p>
+       </div>
+       <div class="drop-filebox">
+         <div class="drop-filebox-ico">${s?IC.file:IC.upload}</div>
+         <div class="drop-filebox-info">
+           <span class="drop-filename" title="${E(s?(S.nm[k]||'File terpilih'):h)}">${E(s?(S.nm[k]||'File terpilih'):'Pilih atau tarik file .xlsx')}</span>
+           <span class="drop-hint">${s?'Ketuk untuk mengganti file':E(h)}</span>
+         </div>
+       </div>
+       <div class="drop-summary">
+         ${s?IC.check:IC.info}
+         <span>${s?E(s):'Belum ada file yang diimpor'}</span>
+       </div>
+     </label>`).join('')}
+   </div></div>`;
+ }
+
+ if(S.step===1){const sc=Object.keys(S.sel).filter(c=>S.sel[c]).length;v.innerHTML=`<div class="card">
+   <div class="card-head">
+     <div class="card-title"><div class="card-icon">${IC.cols}</div><div><h2>2. Duplikasi Sheet ALL → UMUM</h2><p class="mu">Pilih kolom acuan dan centang kolom yang ingin ikut disalin. Kolom Nama & LPK terkunci otomatis.</p></div></div>
+   </div>
+   <div class="grid">
+     <div><div class="field-label">Kolom Nama Klien</div><select data-p="namaCol">${hdr.map((h,c)=>c?`<option value="${c}" ${c==S.namaCol?'selected':''}>${cn(c)} — ${E(h||'(kosong)')}</option>`:'').join('')}</select></div>
+     <div><div class="field-label">Kolom Nama LPK</div><select data-p="lpkCol">${hdr.map((h,c)=>c?`<option value="${c}" ${c==S.lpkCol?'selected':''}>${cn(c)} — ${E(h||'(kosong)')}</option>`:'').join('')}</select></div>
+   </div>
+   <div class="toolbar">
+     <div class="toolbar-actions">
+       <button class="g" data-a="all">${IC.check} Pilih semua</button>
+       <button class="g" data-a="none">Kosongkan</button>
+     </div>
+     <span class="badge-count" id="cc">${sc} kolom dipilih</span>
+   </div>
+   <div class="cols">${hdr.map((h,c)=>{if(!c)return'';const lk=c==S.namaCol||c==S.lpkCol;return`<label class="${lk?'lk':''}"><input type="checkbox" data-c="${c}" ${S.sel[c]||lk?'checked':''} ${lk?'disabled':''}><span class="col-code">${cn(c)}</span><span>${E(h||'(tanpa judul)')}</span></label>`}).join('')}</div>
+ </div>`}
+
+ if(S.step===2)lpkView();
+
+ if(S.step===3){build();v.innerHTML=`<div class="card">
+   <div class="card-head">
+     <div class="card-title"><div class="card-icon">${IC.split}</div><div><h2>4. Hasil Pemecahan Data</h2><p class="mu">Sheet LPK MOU disusun urut A–Z mulai sheet ke-3. Baris di bawah judul HOLD ikut terbawa, dan nama yang cocok dengan sumber ditandai warna <span class="pu">${IC.spark} ungu</span>.</p></div></div>
+   </div>
+   <div class="stat">
+     <div class="stat-box"><b>${R.names.length}</b>LPK sudah MOU<span class="stat-ico">${IC.mou}</span></div>
+     <div class="stat-box"><b>${R.miss.length}</b>MOU tanpa data<span class="stat-ico">${IC.cols}</span></div>
+     <div class="stat-box"><b>${R.um.length}</b>Baris sisa UMUM<span class="stat-ico">${IC.src}</span></div>
+     <div class="stat-box"><b>${R.purple}</b>Nama ungu<span class="stat-ico">${IC.spark}</span></div>
+     <div class="stat-box"><b>${R.hold}</b>Baris HOLD terbawa<span class="stat-ico">${IC.split}</span></div>
+     <div class="stat-box"><b>${R.chk?'Aman':'Periksa'}</b>Cek duplikasi UMUM<span class="stat-ico">${IC.checkCircle}</span></div>
+   </div>
+ </div>
+ <div class="grid" style="grid-template-columns:1fr">
+   <div class="card"><h3>${IC.table} LPK MOU yang Jadi Sheet</h3><div class="sc"><table><tr><th>Nama Sheet LPK</th><th>Baris</th><th>Ungu</th></tr>${R.names.map(n=>`<tr><td><b>${E(n)}</b></td><td>${R.g[n].length}</td><td><span class="pu">${R.g[n].filter(o=>o.pu).length}</span></td></tr>`).join('')}</table></div></div>
+   <div class="card"><h3>${IC.table} LPK Belum MOU (Sisa di UMUM) <span class="tab-num">${R.non.length}</span></h3><p class="mu" style="margin:4px 0 12px">Urut A–Z. Ketuk <b>Ganti</b> untuk menyesuaikan nama LPK ke daftar MOU, nanti datanya pindah ke sheet LPK tersebut.</p><div class="sc tall" id="nonsc"><table><tr><th>Nama LPK</th><th>Baris</th><th class="ta">Aksi</th></tr>${R.non.map(([n,c])=>`<tr data-v="${E(n)}"><td>${E(n)}</td><td>${c}</td><td class="ta"><button class="g sm" data-a="chg">${IC.edit} Ganti</button></td></tr>`).join('')||'<tr><td colspan="3" class="mu" style="text-align:center;padding:18px">Semua LPK sudah cocok dengan MOU 🎉</td></tr>'}</table></div></div>
+ </div>`}
+
+ if(S.step===4){build();v.innerHTML=`<div class="card">
+   <div class="card-head">
+     <div class="card-title"><div class="card-icon">${IC.dl}</div><div><h2>5. Unduh File Excel Final</h2><p class="mu">File hasil mencakup sheet <b>ALL</b>, <b>UMUM</b>, <b>${R.names.length} sheet LPK MOU</b>, serta <b>RINGKASAN</b>.</p></div></div>
+   </div>
+   <div class="export-box">
+     <div class="field-label">Nama File Keluaran (.xlsx)</div>
+     <input type="text" id="fn" value="${E(S.fn)}" placeholder="Hasil_MOU_LPK">
+     <p style="margin:16px 0 0"><button id="dl">${IC.dl} Buat dan Unduh Excel</button></p>
+     <p class="mu" id="ms" style="margin-top:10px"></p>
+   </div>
+ </div>`}}
+
+function lpkView(){const o0=$('#ls'),sy=o0?o0.scrollTop:0,it=items(),cnt={};it.forEach(i=>cnt[stOf(i)]=(cnt[stOf(i)]||0)+1);const T=[['sug','Perlu dicek'],['done','Sudah diganti'],['ok','Sudah cocok'],['none','Tanpa saran']];
+ $('#v').innerHTML=`<div class="card">
+   <div class="card-head">
+     <div class="card-title"><div class="card-icon">${IC.match}</div><div><h2>3. Samakan Nama LPK dengan MOU</h2><p class="mu">Daftar urut A–Z. Ketuk <b>Ganti</b> pada saran yang sesuai, atau ketik nama LPK MOU secara manual.</p></div></div>
+     <button class="g" data-a="strong">${IC.spark} Terima saran kuat (≥85%)</button>
+   </div>
+   <div class="lpk-panel"><div class="lpk-top">
+   <div class="tabs">${T.map(([k,l])=>`<button class="${S.tab===k?'on':''}" data-t="${k}"><span>${l}</span> <span class="tab-num">${cnt[k]||0}</span></button>`).join('')}</div>
+   <div class="search-wrap">${IC.search}<input type="text" id="q" placeholder="Cari nama LPK..." value="${E(S.q)}"></div>
+   </div>
+   <div class="lpk-scroll" id="ls"></div>
+   <div class="pager" id="pgr"></div>
+   </div>
+ </div>`;list();$('#ls').scrollTop=sy}
+
+const PG=50;
+function list(){const q=S.q.toLowerCase(),all=items().filter(i=>stOf(i)===S.tab&&(!q||i.v.toLowerCase().includes(q))).sort((x,y)=>x.v.localeCompare(y.v,'id',{numeric:true,sensitivity:'base'})),pages=Math.max(1,Math.ceil(all.length/PG));
+ if(S.pg>=pages)S.pg=pages-1;if(S.pg<0)S.pg=0;const st=S.pg*PG,a=all.slice(st,st+PG);
+ const pager=`<span class="pager-info">${all.length?(st+1)+'–'+(st+a.length)+' dari '+all.length+' LPK':'0 LPK'} · urut A–Z${pages>1?' · Hal '+(S.pg+1)+'/'+pages:''}</span>`+(pages>1?`<span class="pager-btns"><button class="g sm" data-a="pg" data-d="-1" ${S.pg===0?'disabled':''}>${IC.prev} Sebelumnya</button><button class="sm" data-a="pg" data-d="1" ${S.pg>=pages-1?'disabled':''}>Berikutnya ${IC.next}</button></span>`:'');
+ const body=a.map(i=>`<div class="it" data-v="${E(i.v)}">
+   <div class="it-top"><span class="it-name">${E(i.v)}</span><span class="row-pill">${i.n} baris</span></div>
+   ${i.sg&&!S.dec[i.v]?`<div class="sg">${IC.spark} <span>Saran MOU: <b>${E(i.sg.n)}</b></span> <span class="sg-match">${Math.round(i.sg.s*100)}% cocok</span><button data-a="acc">Ganti</button></div>`:''}
+   ${i.ok?`<span class="ok">${IC.check} Sudah sesuai daftar MOU</span>`:`<input type="text" list="moul" placeholder="Ketik atau pilih nama MOU manual..." value="${E(S.dec[i.v]||'')}" data-a="man">${S.dec[i.v]?`<span class="ok">${IC.check} Akan diganti menjadi: ${E(S.dec[i.v])}</span>`:''}`}
+ </div>`).join('')||'<p class="mu" style="text-align:center;padding:24px 0">Tidak ada data LPK pada kategori ini.</p>';
+ $('#ls').innerHTML=body;$('#pgr').innerHTML=pager}
+
+// ---------- riwayat: simpan & muat ----------
+const HK=['step','fn','sel','lpkCol','namaCol','dec','nm','tab','q','pg'],HAPP='olah-data-list-nama';
+const b64=buf=>new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result.split(',')[1]);fr.readAsDataURL(new Blob([buf]))});
+const unb64=s=>{const b=atob(s),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u.buffer};
+async function saveBlob(blob,fn){const d=window.claude&&await claude.use('downloads');if(d){await d.save({filename:fn,data:blob});return}
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fn;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000)}
+function openSave(){const n=Object.keys(S.dec).length,f=['s','m','t'].filter(k=>F[k]).length,d=new Date().toISOString().slice(0,10);
+ $('#mn').value='Riwayat_'+(S.fn||'Hasil_MOU_LPK').replace(/\.xlsx$/i,'')+'_'+d;
+ $('#mi').textContent='Isi riwayat: '+f+' file Excel, '+n+' LPK yang sudah diganti, posisi di langkah '+(S.step+1)+'.';
+ $('#md').hidden=false;setTimeout(()=>{const i=$('#mn');i.focus();i.select()},30)}
+const closeSave=()=>{$('#md').hidden=true};
+async function doSave(btn){let n=$('#mn').value.replace(/[\\\/:*?"<>|]+/g,'_').replace(/\.json$/i,'').trim();if(!n){toast('Isi nama file dulu ya');return}
+ btn.disabled=true;const old=btn.textContent;btn.textContent='Menyimpan...';await pause();
+ try{const files={};for(const k of['s','m','t'])if(F[k])files[k]=await b64(F[k]);const state={};HK.forEach(k=>state[k]=S[k]);
+  const blob=new Blob([JSON.stringify({app:HAPP,v:1,savedAt:new Date().toISOString(),state,files})],{type:'application/json'});
+  await saveBlob(blob,n+'.json');closeSave();toast('Riwayat tersimpan: '+n+'.json ✓')}
+ catch(x){toast(x&&x.code==='declined'?'Penyimpanan dibatalkan':'Gagal menyimpan riwayat')}
+ btn.disabled=false;btn.textContent=old}
+async function loadSnap(f){toast('Membaca riwayat...');await pause();let d;
+ try{d=JSON.parse(await f.text());if(d.app!==HAPP||!d.state)throw 0}catch(x){toast('File ini bukan file riwayat yang valid');return}
+ if(!confirm('Muat riwayat "'+f.name+'"? Pekerjaan yang sekarang akan diganti.'))return;
+ try{Object.assign(S,{step:0,sel:{},dec:{},nm:{},tab:'sug',q:'',pg:0,lpkCol:0,namaCol:0},d.state);
+  delete F.s;delete F.m;delete F.t;ws=undefined;hdr=[];rows=[];SEC=[];mou=[];src=new Set();srcInfo='';cache=null;R=null;$('#moul').innerHTML='';
+  for(const k of['s','m','t']){if(d.files&&d.files[k]){F[k]=unb64(d.files[k]);put('f_'+k,F[k]);await parse(k)}else put('f_'+k,null)}
+  if(S.step>0&&!ready(0))S.step=0;save();view();scrollTo(0,0);toast('Riwayat dimuat ✓ '+f.name)}
+ catch(x){toast('Riwayat gagal dimuat, file mungkin rusak')}}
+
+// ---------- ganti LPK langsung dari daftar langkah 4 ----------
+const edRow=n=>{const it=items().find(i=>i.v===n),sg=it&&it.sg;return`<tr class="ed-row" data-v="${E(n)}"><td colspan="3"><div class="ed">
+  ${sg?`<div class="sg">${IC.spark} <span>Saran MOU: <b>${E(sg.n)}</b></span> <span class="sg-match">${Math.round(sg.s*100)}% cocok</span><button data-a="use" data-n="${E(sg.n)}">Pakai saran</button></div>`:''}
+  <div class="ed-in"><input type="text" list="moul" data-a="rn" placeholder="Ketik atau pilih nama LPK MOU..." autocomplete="off"><button data-a="sv">Simpan</button><button class="g" data-a="cx">Batal</button></div>
+ </div></td></tr>`};
+function applyDec(v,x){x=String(x||'').trim();if(!x){toast('Ketik atau pilih nama LPK MOU dulu');return}
+ const m=mou.find(m=>m.u===x.toUpperCase());if(!m){toast('Nama itu tidak ada di daftar MOU');return}
+ S.dec[v]=m.n;save();const y=scrollY,sc=$('#nonsc'),st=sc?sc.scrollTop:0;view();scrollTo(0,y);const s2=$('#nonsc');if(s2)s2.scrollTop=st;toast('Dipindah ke MOU: '+m.n)}
+
+// ---------- ekspor ----------
+const sName=(n,u)=>{let s=n.replace(/[\\\/?*\[\]:]/g,' ').replace(/\s+/g,' ').trim().slice(0,31)||'LPK',b=s,i=2;while(u.has(s.toLowerCase()))s=b.slice(0,28)+' '+i++;u.add(s.toLowerCase());return s};
+async function exportX(){const w=new ExcelJS.Workbook();await w.xlsx.load(F.t.slice(0));const A=w.getWorksheet('ALL')||w.worksheets[0],used=new Set(['all','umum','ringkasan']);
+ const cols=Object.keys(S.sel).map(Number).filter(c=>S.sel[c]||c==S.lpkCol||c==S.namaCol).sort((a,b)=>a-b),li=cols.indexOf(S.lpkCol)+1,ni=cols.indexOf(S.namaCol)+1;
+ const mk=(name,list,pu)=>{const n=w.addWorksheet(name);cols.forEach((c,i)=>{n.getColumn(i+1).width=A.getColumn(c).width||14});
+  const cp=(sr,tr)=>{const r0=A.getRow(sr),t=n.getRow(tr);if(r0.height)t.height=r0.height;cols.forEach((c,i)=>{const s=r0.getCell(c),d=t.getCell(i+1);d.value=val(s);d.style=JSON.parse(JSON.stringify(s.style||{}))})};
+  cp(1,1);let t=2;for(const sc of ['',...SEC]){const l=list.filter(o=>o.sec===sc);if(!l.length)continue;
+   if(sc){if(t>2)t++;for(let i=1;i<=cols.length;i++)n.getCell(t,i).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFFE08A'}};const c=n.getCell(t,1);c.value=sc;c.font={bold:true,size:12};t++}
+   l.forEach(o=>{cp(o.r,t);n.getCell(t,li).value=o.lpk;if(pu&&o.pu)n.getCell(t,ni).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFB39DDB'}};t++})}
+  n.views=[{state:'frozen',ySplit:1}];n.autoFilter={from:{row:1,column:1},to:{row:Math.max(1,t-1),column:cols.length}}};
+ mk('UMUM',R.um,false);R.names.forEach(n=>mk(sName(n,used),R.g[n],true));
+ const s=w.addWorksheet('RINGKASAN');s.columns=[{width:46},{width:16},{width:22}];const H=r=>r.eachCell(c=>{c.font={bold:true};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFE0D8F7'}}});
+ s.addRow(['RINGKASAN DATA MOU LPK']).font={bold:true,size:14};s.addRow(['LPK sudah MOU (punya data)',R.names.length]);s.addRow(['LPK MOU belum ada datanya',R.miss.length]);s.addRow(['Baris sisa di UMUM (belum MOU)',R.um.length]);s.addRow(['Nama ungu (sama dengan sumber)',R.purple]);s.addRow(['Baris HOLD yang ikut terbawa',R.hold]);
+ s.addRow([]);H(s.addRow(['LPK SUDAH MOU','Jumlah baris','Nama ungu']));R.names.forEach(n=>s.addRow([n,R.g[n].length,R.g[n].filter(o=>o.pu).length]));
+ s.addRow([]);H(s.addRow(['LPK MOU TANPA DATA']));R.miss.forEach(n=>s.addRow([n]));
+ s.addRow([]);H(s.addRow(['LPK BELUM MOU (di UMUM)','Jumlah baris']));R.non.forEach(r=>s.addRow(r));
+ return new Blob([await w.xlsx.writeBuffer()],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'})}
+
+// ---------- event ----------
+document.addEventListener('dragover',e=>{const d=e.target.closest('.drop');if(d){e.preventDefault();d.classList.add('drag')}});
+document.addEventListener('dragleave',e=>{const d=e.target.closest('.drop');if(d)d.classList.remove('drag')});
+document.addEventListener('drop',e=>{const d=e.target.closest('.drop');if(d)d.classList.remove('drag')});
+
+document.addEventListener('change',async e=>{const t=e.target;
+ if(t.id==='hf'){const f=t.files[0];t.value='';if(f)await loadSnap(f)}
+ else if(t.dataset.k){const f=t.files[0];if(!f)return;toast('Membaca '+f.name+'...');await pause();try{const b=await f.arrayBuffer();F[t.dataset.k]=b;S.nm[t.dataset.k]=f.name;put('f_'+t.dataset.k,b);await parse(t.dataset.k);save();toast('File terbaca ✓')}catch(x){toast('File gagal dibaca, pastikan format .xlsx')}view()}
+ else if(t.dataset.p){S[t.dataset.p]=+t.value;loadRows();save();view()}
+ else if(t.dataset.c){S.sel[t.dataset.c]=t.checked;$('#cc').textContent=Object.values(S.sel).filter(Boolean).length+' kolom dipilih';save()}
+ else if(t.dataset.a==='man'){const v=t.closest('.it').dataset.v,x=t.value.trim(),m=mou.find(m=>m.u===x.toUpperCase());if(!x)delete S.dec[v];else if(m)S.dec[v]=m.n;else toast('Nama itu tidak ada di MOU');save();lpkView()}
+ else if(t.id==='fn'){S.fn=t.value.trim()||'Hasil_MOU_LPK';save()}});
+
+document.addEventListener('input',e=>{if(e.target.id==='q'){S.q=e.target.value;S.pg=0;list();$('#ls').scrollTop=0}});
+document.addEventListener('keydown',e=>{if(!$('#md').hidden){if(e.key==='Escape')closeSave();else if(e.key==='Enter'&&e.target.id==='mn'){e.preventDefault();doSave($('#mc'))}return}
+ const t=e.target;if(e.key==='Enter'&&t.dataset&&t.dataset.a==='rn'&&mou.some(m=>m.u===t.value.trim().toUpperCase())){e.preventDefault();applyDec(t.closest('.ed-row').dataset.v,t.value)}});
+
+document.addEventListener('click',async e=>{const t=e.target.closest('[data-a],[data-t],[data-s],#dl,#bk,#nx,#rs,#hs,#mc,#mx');if(!t)return;
+ if(t.dataset.s){const s=+t.dataset.s;if(s<=S.step||ready(0)){S.step=s;save();view()}}
+ else if(t.id==='hs'){openSave()}
+ else if(t.id==='mx'){closeSave()}
+ else if(t.id==='mc'){doSave(t)}
+ else if(t.id==='bk'){S.step--;save();view()}else if(t.id==='nx'){S.step++;save();view();scrollTo(0,0)}
+ else if(t.id==='rs'){if(confirm('Hapus semua pekerjaan dan mulai dari awal?')){try{indexedDB.deleteDatabase('moudash')}catch(x){}location.reload()}}
+ else if(t.dataset.t){S.tab=t.dataset.t;S.pg=0;lpkView();$('#ls').scrollTop=0}
+ else if(t.dataset.a==='pg'){S.pg+=+t.dataset.d;list();$('#ls').scrollTop=0}
+ else if(t.dataset.a==='chg'){const tr=t.closest('tr'),v=tr.dataset.v,old=document.querySelector('.ed-row'),same=old&&old.dataset.v===v;if(old)old.remove();if(!same){tr.insertAdjacentHTML('afterend',edRow(v));const i=tr.nextElementSibling.querySelector('input');if(i)i.focus()}}
+ else if(t.dataset.a==='cx'){t.closest('.ed-row').remove()}
+ else if(t.dataset.a==='use'){applyDec(t.closest('tr').dataset.v,t.dataset.n)}
+ else if(t.dataset.a==='sv'){const r=t.closest('.ed-row');applyDec(r.dataset.v,r.querySelector('input').value)}
+ else if(t.dataset.a==='all'||t.dataset.a==='none'){hdr.forEach((h,c)=>{if(c)S.sel[c]=t.dataset.a==='all'});save();view()}
+ else if(t.dataset.a==='acc'){const v=t.closest('.it').dataset.v,i=items().find(i=>i.v===v);S.dec[v]=i.sg.n;save();lpkView()}
+ else if(t.dataset.a==='strong'){let n=0;items().forEach(i=>{if(i.sg&&i.sg.s>=.85&&!S.dec[i.v]){S.dec[i.v]=i.sg.n;n++}});save();toast(n+' saran diterima');lpkView()}
+ else if(t.id==='dl'){const ms=$('#ms');t.disabled=true;ms.textContent='Menyusun file Excel... mohon tunggu';await pause();
+  try{const b=await exportX(),fn=(S.fn||'Hasil_MOU_LPK').replace(/\.xlsx$/i,'')+'.xlsx',d=window.claude&&await claude.use('downloads');
+   if(d){await d.save({filename:fn,data:b});ms.textContent='Selesai ✓ File siap disimpan.'}else{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=fn;a.click();ms.textContent='File berhasil dibuat dan diunduh.'}}
+  catch(x){ms.textContent=x&&x.code==='declined'?'Unduhan dibatalkan.':'Gagal membuat file: '+(x.message||x)}t.disabled=false}});
+
+// ---------- mulai ----------
+(async()=>{const st=await get('st');if(st)Object.assign(S,st);
+ for(const k of['s','m','t']){const b=await get('f_'+k);if(b){F[k]=b;try{await parse(k)}catch(x){}}}
+ if(S.step>0&&!ready(0))S.step=0;view();if(st&&ws){$('#sv').innerHTML=IC.cloudOk+' Tersimpan';toast('Pekerjaan terakhirmu dipulihkan ✓')}})();
+</script>
+</body>
+</html>
