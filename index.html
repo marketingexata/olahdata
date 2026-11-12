@@ -977,13 +977,17 @@ button.hbtn:hover:not(:disabled),label.hbtn:hover{background:rgba(255,255,255,.2
 .steps{position:sticky;top:env(safe-area-inset-top,0px);z-index:7;margin:0 -18px;padding:12px 18px 14px;background:rgba(250,247,242,.93);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
 
 /* Panel daftar LPK langkah 3: atas beku, tengah scroll, bawah beku */
-.lpk-panel{display:flex;flex-direction:column;height:clamp(360px,calc(100vh - 330px),780px);height:clamp(360px,calc(100dvh - 330px),780px);border:1px solid var(--bd);border-radius:16px;background:#fff;overflow:hidden;margin-top:12px}
+.lpk-panel{display:flex;flex-direction:column;height:clamp(380px,calc(100vh - 300px),800px);height:clamp(380px,calc(100dvh - 300px),800px);border:1px solid var(--bd);border-radius:16px;background:#fff;overflow:hidden;margin-top:12px}
 .lpk-top{flex:none;padding:0 12px 2px;background:#fcfaf7;border-bottom:1px solid var(--bd)}
 .lpk-top .tabs{margin:10px 0 8px}
 .lpk-top .search-wrap{margin:0 0 10px}
 .lpk-scroll{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:2px 12px 6px}
-.lpk-panel .pager{flex:none;margin:0;padding:10px 12px;border-top:1px solid var(--bd);background:#fcfaf7}
+.lpk-top .pager{margin:0 0 10px;padding:0;gap:8px}
 .pager-btns{display:flex;gap:8px}
+.lpk-bottom{flex:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;background:#fcfaf7;border-top:1px solid var(--bd)}
+.lpk-bottom:empty{display:none}
+.lpk-bottom .pager-mid{font-size:12.5px;font-weight:600;color:var(--mu);text-align:center;flex:1}
+.lpk-bottom button.sm{padding:8px 16px}
 </style>
 </head>
 <body>
@@ -1243,22 +1247,25 @@ function lpkView(){const o0=$('#ls'),sy=o0?o0.scrollTop:0,it=items(),cnt={};it.f
    <div class="lpk-panel"><div class="lpk-top">
    <div class="tabs">${T.map(([k,l])=>`<button class="${S.tab===k?'on':''}" data-t="${k}"><span>${l}</span> <span class="tab-num">${cnt[k]||0}</span></button>`).join('')}</div>
    <div class="search-wrap">${IC.search}<input type="text" id="q" placeholder="Cari nama LPK..." value="${E(S.q)}"></div>
+   <div class="pager" id="pgr"></div>
    </div>
    <div class="lpk-scroll" id="ls"></div>
-   <div class="pager" id="pgr"></div>
+   <div class="lpk-bottom" id="pgb"></div>
    </div>
  </div>`;list();$('#ls').scrollTop=sy}
 
 const PG=50;
-function list(){const q=S.q.toLowerCase(),all=items().filter(i=>stOf(i)===S.tab&&(!q||i.v.toLowerCase().includes(q))).sort((x,y)=>x.v.localeCompare(y.v,'id',{numeric:true,sensitivity:'base'})),pages=Math.max(1,Math.ceil(all.length/PG));
+const AZ=v=>String(v||'').trim().replace(/^[^\p{L}\p{N}]+/u,'');
+function list(){const q=S.q.toLowerCase(),all=items().filter(i=>stOf(i)===S.tab&&(!q||i.v.toLowerCase().includes(q))).sort((x,y)=>AZ(x.v).localeCompare(AZ(y.v),'id',{numeric:true,sensitivity:'base'})||x.v.localeCompare(y.v,'id')),pages=Math.max(1,Math.ceil(all.length/PG));
  if(S.pg>=pages)S.pg=pages-1;if(S.pg<0)S.pg=0;const st=S.pg*PG,a=all.slice(st,st+PG);
- const pager=`<span class="pager-info">${all.length?(st+1)+'–'+(st+a.length)+' dari '+all.length+' LPK':'0 LPK'} · urut A–Z${pages>1?' · Hal '+(S.pg+1)+'/'+pages:''}</span>`+(pages>1?`<span class="pager-btns"><button class="g sm" data-a="pg" data-d="-1" ${S.pg===0?'disabled':''}>${IC.prev} Sebelumnya</button><button class="sm" data-a="pg" data-d="1" ${S.pg>=pages-1?'disabled':''}>Berikutnya ${IC.next}</button></span>`:'');
+ const pager=`<span class="pager-info">${all.length?(st+1)+'–'+(st+a.length)+' dari '+all.length+' LPK':'0 LPK'} · urut A–Z${pages>1?' · Hal '+(S.pg+1)+'/'+pages:''}</span>`,
+  pagerB=pages>1?`<button class="g sm" data-a="pg" data-d="-1" ${S.pg===0?'disabled':''}>${IC.prev} Sebelumnya</button><span class="pager-mid">Hal ${S.pg+1} / ${pages}</span><button class="sm" data-a="pg" data-d="1" ${S.pg>=pages-1?'disabled':''}>Berikutnya ${IC.next}</button>`:'';
  const body=a.map(i=>`<div class="it" data-v="${E(i.v)}">
    <div class="it-top"><span class="it-name">${E(i.v)}</span><span class="row-pill">${i.n} baris</span></div>
    ${i.sg&&!S.dec[i.v]?`<div class="sg">${IC.spark} <span>Saran MOU: <b>${E(i.sg.n)}</b></span> <span class="sg-match">${Math.round(i.sg.s*100)}% cocok</span><button data-a="acc">Ganti</button></div>`:''}
    ${i.ok?`<span class="ok">${IC.check} Sudah sesuai daftar MOU</span>`:`<input type="text" list="moul" placeholder="Ketik atau pilih nama MOU manual..." value="${E(S.dec[i.v]||'')}" data-a="man">${S.dec[i.v]?`<span class="ok">${IC.check} Akan diganti menjadi: ${E(S.dec[i.v])}</span>`:''}`}
  </div>`).join('')||'<p class="mu" style="text-align:center;padding:24px 0">Tidak ada data LPK pada kategori ini.</p>';
- $('#ls').innerHTML=body;$('#pgr').innerHTML=pager}
+ $('#ls').innerHTML=body;$('#pgr').innerHTML=pager;$('#pgb').innerHTML=pagerB}
 
 // ---------- riwayat: simpan & muat ----------
 const HK=['step','fn','sel','lpkCol','namaCol','dec','nm','tab','q','pg'],HAPP='olah-data-list-nama';
