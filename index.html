@@ -1054,8 +1054,9 @@ button.hbtn:hover:not(:disabled),label.hbtn:hover{background:rgba(255,255,255,.2
 
 <script>
 const $=s=>document.querySelector(s),E=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const S={step:0,fn:'Hasil_MOU_LPK',sel:{},lpkCol:0,namaCol:0,dec:{},nm:{},tab:'sug',q:'',pg:0},F={};
-let SEC=[],ws,hdr=[],rows=[],mou=[],src=new Set(),srcInfo='',cache=null,R=null;
+const S={step:0,fn:'Hasil_MOU_LPK',sel:{},lpkCol:0,namaCol:0,dec:{},ov:{},nm:{},tab:'sug',q:'',pg:0,dt:'all',dq:'',dp:0},F={};
+let SIMP=null,SC=new Map(),SEC=[],ws,hdr=[],rows=[],mou=[],src=new Set(),srcBy=new Map(),LK=null,srcInfo='',cache=null,R=null;
+const PURPLE='FFFF00FF',YELLOW='FFFFFF00';
 const NAMES=['Impor','UMUM','Nama LPK','Pecah','Unduh'];
 
 // Koleksi Simple Lineart SVG
@@ -1087,7 +1088,7 @@ const toast=t=>{const e=$('#toast');e.textContent=t;e.classList.add('on');clearT
 const idb=()=>new Promise((a,b)=>{const q=indexedDB.open('moudash',1);q.onupgradeneeded=()=>q.result.createObjectStore('kv');q.onsuccess=()=>a(q.result);q.onerror=()=>b(q.error)});
 const put=async(k,v)=>{try{(await idb()).transaction('kv','readwrite').objectStore('kv').put(v,k)}catch(e){}};
 const get=async k=>{try{const d=await idb();return await new Promise(r=>{const q=d.transaction('kv').objectStore('kv').get(k);q.onsuccess=()=>r(q.result);q.onerror=()=>r()})}catch(e){}};
-const save=()=>{put('st',{step:S.step,fn:S.fn,sel:S.sel,lpkCol:S.lpkCol,namaCol:S.namaCol,dec:S.dec,nm:S.nm});$('#sv').innerHTML=IC.cloudOk+' Tersimpan'};
+const save=()=>{put('st',{step:S.step,fn:S.fn,sel:S.sel,lpkCol:S.lpkCol,namaCol:S.namaCol,dec:S.dec,ov:S.ov,nm:S.nm});$('#sv').innerHTML=IC.cloudOk+' Tersimpan'};
 const val=c=>{let v=c.value;if(v&&typeof v==='object'&&!(v instanceof Date)){v=v.result!==undefined?v.result:v.richText?v.richText.map(t=>t.text).join(''):v.text!==undefined?v.text:null;if(v&&typeof v==='object')v=null}return v};
 const pause=()=>new Promise(r=>setTimeout(r,40));
 
@@ -1101,17 +1102,17 @@ async function parse(k){
  if(k==='m'){const w=XLSX.read(F.m,{type:'array'});const a=XLSX.utils.sheet_to_json(w.Sheets[w.SheetNames[0]],{header:1});const seen=new Set();mou=[];
   (a[0]||[]).forEach((h,c)=>{if(/^NAMA/i.test(h||''))for(let r=1;r<a.length;r++){const n=String(a[r][c]??'').trim(),u=n.toUpperCase();if(n&&!seen.has(u)){seen.add(u);
    const pr=[...n.matchAll(/\(([^)]*)\)/g)].map(x=>x[1]);mou.push({n,u,al:[n.replace(/\(.*?\)/g,' '),...pr,n].map(cl)})}}});
-  $('#moul').innerHTML=mou.map(m=>`<option value="${E(m.n)}">`).join('');cache=null}
- if(k==='s'){const w=XLSX.read(F.s,{type:'array'});src=new Set();
-  for(const n of w.SheetNames){const a=XLSX.utils.sheet_to_json(w.Sheets[n],{header:1,raw:true});let h=-1,c=-1;
+  $('#moul').innerHTML='<option value="UMUM">'+mou.map(m=>`<option value="${E(m.n)}">`).join('');cache=null;LK=null}
+ if(k==='s'){const w=XLSX.read(F.s,{type:'array'});src=new Set();srcBy=new Map();LK=null;SC=new Map();
+  for(const n of w.SheetNames){const a=XLSX.utils.sheet_to_json(w.Sheets[n],{header:1,raw:true});let h=-1,c=-1;const st=new Set();
    for(let i=0;i<Math.min(3,a.length)&&h<0;i++)(a[i]||[]).forEach((x,j)=>{if(h<0&&/^NAMA/i.test(String(x||''))&&!/KAISHA/i.test(x)){h=i;c=j}});
-   if(h<0)continue;for(let i=h+1;i<a.length;i++){const v=a[i]&&a[i][c];if(typeof v==='string'&&v.trim())src.add(nz(v))}}
+   if(h<0)continue;for(let i=h+1;i<a.length;i++){const v=a[i]&&a[i][c];if(typeof v==='string'&&v.trim()){st.add(nz(v));src.add(nz(v))}}srcBy.set(n,st)}
   srcInfo=w.SheetNames.length+' sheet, '+src.size.toLocaleString('id')+' nama unik'}
  R=null}
 
 function loadRows(){rows=[];SEC=[];if(!ws)return;let cur='';for(let r=2;r<=ws.rowCount;r++){const row=ws.getRow(r);if(!row.hasValues)continue;const a=val(row.getCell(1)),nm=String(val(row.getCell(S.namaCol))??'').trim(),lp=String(val(row.getCell(S.lpkCol))??'').trim();
  if(typeof a==='string'&&a.trim()&&isNaN(+a)&&!nm&&!lp&&row.actualCellCount<=1){cur=a.trim();SEC.push(cur);continue}
- rows.push({r,lpk:lp,nm,sec:cur})}cache=null;R=null}
+ rows.push({r,lpk:lp,nm,sec:cur})}cache=null;R=null;SIMP=null;SC=new Map()}
 
 // ---------- pencocokan nama ----------
 const STOP=new Set(['LPK','PT','SO','YAYASAN','DEPOK','CV','LKP']);
@@ -1126,11 +1127,44 @@ function items(){if(cache)return cache;const c=new Map(),mu=new Set(mou.map(m=>m
 const stOf=i=>i.ok?'ok':S.dec[i.v]?'done':i.sg?'sug':'none';
 
 // ---------- proses pecah ----------
-function build(){const m=new Map(mou.map(x=>[x.u,x.n])),g={},um=[];let n=0;
- rows.forEach(r=>{const nv=S.dec[r.lpk]||r.lpk,k=m.get(String(nv).trim().toUpperCase()),o={r:r.r,lpk:k||nv,nm:r.nm,pu:src.has(nz(r.nm)),sec:r.sec};
-  if(k){(g[k]=g[k]||[]).push(o);if(o.pu)n++}else um.push(o)});
- const non=new Map();um.forEach(o=>{if(o.lpk)non.set(o.lpk,(non.get(o.lpk)||0)+1)});
- R={g,um,names:Object.keys(g).sort((a,b)=>a.localeCompare(b)),non:[...non].sort((a,b)=>a[0].localeCompare(b[0],'id',{numeric:true,sensitivity:'base'})),purple:n,hold:rows.filter(r=>r.sec).length,chk:Object.values(g).reduce((a,b)=>a+b.length,0)+um.length===rows.length,miss:mou.filter(x=>!g[x.n]).map(x=>x.n)}}
+// ---------- kemiripan nama ----------
+const tk=z=>String(z).toLowerCase().replace(/[^a-z0-9 ]/g,' ').split(/\s+/).filter(Boolean);
+function simN(a,b,df){if(a===b)return false;const ta=tk(a),tb=tk(b);if(!ta.length||!tb.length)return false;
+ const sh=ta.length<=tb.length?ta:tb,lg=ta.length<=tb.length?tb:ta;
+ if(sh.length<lg.length&&sh.join('').length>=6&&sh.every(w=>lg.includes(w))&&Math.min(...sh.map(w=>df[w]||1))<=10)return true;
+ const A=[...ta].sort().join(' '),B=[...tb].sort().join(' ');
+ return A.length>=6&&B.length>=6&&Math.abs(A.length-B.length)<=3&&A[0]===B[0]&&dice(A,B)>=.88}
+function simPairs(){if(SIMP)return SIMP;const nm=[...new Set(rows.map(r=>nz(r.nm)).filter(Boolean))],df={};nm.forEach(z=>new Set(tk(z)).forEach(w=>df[w]=(df[w]||0)+1));
+ const out=[];for(let i=0;i<nm.length;i++)for(let j=i+1;j<nm.length;j++)if(simN(nm[i],nm[j],df))out.push([nm[i],nm[j]]);return SIMP=out}
+function simSrc(z,k){const key=z+'|'+k;if(SC.has(key))return SC.get(key);const df={};tk(z).forEach(w=>df[w]=1);const r=[];
+ for(const sh of shOf(k))for(const x of srcBy.get(sh))if(simN(z,x,df))r.push(x.toUpperCase());const u=[...new Set(r)];SC.set(key,u);return u}
+// sheet sumber <-> LPK MOU: nama sheet dianggap milik LPK MOU bila kata-katanya sama / saling terkandung
+const lkf=(sh,al)=>{const T=cl(sh);if(!T.length)return false;const st=new Set(T),sub=(x,y)=>[...x].every(w=>y.has(w));
+ for(const A of al){if(!A.length)continue;if(A.join(' ')===T.join(' '))return true;const sa=new Set(A),sm=A.length<=T.length?A:T;if((sub(st,sa)||sub(sa,st))&&sm.join('').length>=3)return true}return false};
+const shOf=k=>{if(!LK)LK=new Map();if(LK.has(k))return LK.get(k);const m=mou.find(x=>x.n===k),r=m?[...srcBy.keys()].filter(x=>lkf(x,m.al)):[];LK.set(k,r);return r};
+const mh=a=>{const h=a.filter(o=>o.sec).length;return[a.length-h,h]};
+function build(){const m=new Map(mou.map(x=>[x.u,x.n])),g={},um=[];let n=0,mv=0,rm=0;
+ const inSh=(k,z)=>shOf(k).some(x=>srcBy.get(x).has(z)),ord=[...mou].sort((a,b)=>a.n.localeCompare(b.n,'id'));
+ rows.forEach(r=>{const nv=S.dec[r.lpk]||r.lpk,k=m.get(String(nv).trim().toUpperCase()),z=nz(r.nm),o={r:r.r,lpk:k||nv,nm:r.nm,pu:false,sec:r.sec,ol:r.lpk};
+  const ov=S.ov[r.r];if(ov){if(ov==='UMUM'){o.x=true;o.m=true;um.push(o);return}const k2=m.get(String(ov).toUpperCase());if(k2){o.lpk=k2;o.m=true;if(z&&shOf(k2).length&&inSh(k2,z)){o.pu=true;n++}(g[k2]=g[k2]||[]).push(o);return}}
+  if(!k){um.push(o);return}
+  // LPK ini tidak punya sheet di sumber / baris tanpa nama: tidak bisa dicek, tetap di LPK-nya, tanpa ungu
+  if(!z||!shOf(k).length){(g[k]=g[k]||[]).push(o);return}
+  // nama sama persis dengan sheet sumber LPK yang sama: ungu
+  if(inSh(k,z)){o.pu=true;n++;(g[k]=g[k]||[]).push(o);return}
+  // tidak sinkron: cari LPK asli (sheet sumber lain yang LPK-nya sudah MOU)
+  o.cand=simSrc(z,k);o.ck=k;
+  const t=ord.find(x=>x.n!==k&&shOf(x.n).length&&inSh(x.n,z));
+  if(t){o.lpk=t.n;o.pu=true;n++;mv++;(g[t.n]=g[t.n]||[]).push(o)}else{o.lpk=nv;o.x=true;rm++;um.push(o)}});
+ const non=new Map();um.forEach(o=>{if(o.lpk&&!o.x)non.set(o.lpk,(non.get(o.lpk)||0)+1)});
+ const names=Object.keys(g).sort((a,b)=>a.localeCompare(b));
+const gr=new Map();const add=(o,d)=>{const z=nz(o.nm);if(!z)return;o.d=d;if(!gr.has(z))gr.set(z,[]);gr.get(z).push(o)};
+ names.forEach(k=>g[k].forEach(o=>add(o,k)));um.forEach(o=>add(o,'UMUM'));
+ const d0=[...gr].filter(([z,a])=>a.length>1).map(([z,a])=>({z,nm:a[0].nm,a,kind:new Set(a.map(o=>o.d)).size>1?'beda':'sama'})).sort((x,y)=>(x.kind===y.kind?0:x.kind==='beda'?-1:1)||x.nm.localeCompare(y.nm,'id'));
+ const ex=[];simPairs().forEach(([a,b])=>{const A=gr.get(a),B=gr.get(b);if(A&&B)ex.push({z:a+'|'+b,nm:A[0].nm+' ≈ '+B[0].nm,a:[...A,...B],kind:'mirip'})});
+ const ss=[];[...names.flatMap(k=>g[k]),...um].forEach(o=>{if(o.cand&&o.cand.length)ss.push({z:'s'+o.r,nm:o.nm,a:[o],kind:'sumber',note:'Mirip di sumber ('+o.ck+'): '+o.cand.slice(0,3).join(', ')+(o.cand.length>3?' …':'')})});
+ const srt=(x,y)=>x.nm.localeCompare(y.nm,'id');const dup=[...d0,...ex.sort(srt),...ss.sort(srt)];
+ R={dup,g,um,names,non:[...non].sort((a,b)=>a[0].localeCompare(b[0],'id',{numeric:true,sensitivity:'base'})),purple:n,mv,rm,hold:rows.filter(r=>r.sec).length,holdLpk:names.filter(x=>mh(g[x])[1]>0).length,chk:Object.values(g).reduce((a,b)=>a+b.length,0)+um.length===rows.length,miss:mou.filter(x=>!g[x.n]).map(x=>x.n)}}
 
 // ---------- tampilan ----------
 function steps(){
@@ -1210,7 +1244,7 @@ function view(){steps();const v=$('#v');
 
  if(S.step===3){build();v.innerHTML=`<div class="card">
    <div class="card-head">
-     <div class="card-title"><div class="card-icon">${IC.split}</div><div><h2>4. Hasil Pemecahan Data</h2><p class="mu">Sheet LPK MOU disusun urut A–Z mulai sheet ke-3. Baris di bawah judul HOLD ikut terbawa, dan nama yang cocok dengan sumber ditandai warna <span class="pu">${IC.spark} ungu</span>.</p></div></div>
+     <div class="card-title"><div class="card-icon">${IC.split}</div><div><h2>4. Hasil Pemecahan Data</h2><p class="mu">Sheet LPK MOU disusun urut A–Z mulai sheet ke-3. Baris di bawah judul HOLD ikut terbawa, dan nama ditandai <span class="pu">${IC.spark} ungu</span> hanya jika sama persis dengan sheet sumber LPK yang sama. Nama yang tidak sinkron dipindah ke LPK aslinya (bila sudah MOU) atau ke UMUM.</p></div></div>
    </div>
    <div class="stat">
      <div class="stat-box"><b>${R.names.length}</b>LPK sudah MOU<span class="stat-ico">${IC.mou}</span></div>
@@ -1218,13 +1252,17 @@ function view(){steps();const v=$('#v');
      <div class="stat-box"><b>${R.um.length}</b>Baris sisa UMUM<span class="stat-ico">${IC.src}</span></div>
      <div class="stat-box"><b>${R.purple}</b>Nama ungu<span class="stat-ico">${IC.spark}</span></div>
      <div class="stat-box"><b>${R.hold}</b>Baris HOLD terbawa<span class="stat-ico">${IC.split}</span></div>
+     <div class="stat-box"><b>${R.holdLpk}</b>LPK punya HOLD<span class="stat-ico">${IC.mou}</span></div>
+     <div class="stat-box"><b>${R.mv}</b>Dipindah ke LPK asli<span class="stat-ico">${IC.match}</span></div>
+     <div class="stat-box"><b>${R.rm}</b>Tak sinkron → UMUM<span class="stat-ico">${IC.src}</span></div>
      <div class="stat-box"><b>${R.chk?'Aman':'Periksa'}</b>Cek duplikasi UMUM<span class="stat-ico">${IC.checkCircle}</span></div>
    </div>
  </div>
  <div class="grid" style="grid-template-columns:1fr">
-   <div class="card"><h3>${IC.table} LPK MOU yang Jadi Sheet</h3><div class="sc"><table><tr><th>Nama Sheet LPK</th><th>Baris</th><th>Ungu</th></tr>${R.names.map(n=>`<tr><td><b>${E(n)}</b></td><td>${R.g[n].length}</td><td><span class="pu">${R.g[n].filter(o=>o.pu).length}</span></td></tr>`).join('')}</table></div></div>
+   <div class="card"><h3>${IC.table} LPK MOU yang Jadi Sheet</h3><div class="sc"><table><tr><th>Nama Sheet LPK</th><th>Baris</th><th>Ungu</th><th>MASUK &amp; HOLD</th></tr>${R.names.map(n=>{const[a,b]=mh(R.g[n]);return`<tr><td><b>${E(n)}</b></td><td>${R.g[n].length}</td><td><span class="pu">${R.g[n].filter(o=>o.pu).length}</span></td><td>Masuk ${a} · Hold ${b}</td></tr>`}).join('')}</table></div></div>
    <div class="card"><h3>${IC.table} LPK Belum MOU (Sisa di UMUM) <span class="tab-num">${R.non.length}</span></h3><p class="mu" style="margin:4px 0 12px">Urut A–Z. Ketuk <b>Ganti</b> untuk menyesuaikan nama LPK ke daftar MOU, nanti datanya pindah ke sheet LPK tersebut.</p><div class="sc tall" id="nonsc"><table><tr><th>Nama LPK</th><th>Baris</th><th class="ta">Aksi</th></tr>${R.non.map(([n,c])=>`<tr data-v="${E(n)}"><td>${E(n)}</td><td>${c}</td><td class="ta"><button class="g sm" data-a="chg">${IC.edit} Ganti</button></td></tr>`).join('')||'<tr><td colspan="3" class="mu" style="text-align:center;padding:18px">Semua LPK sudah cocok dengan MOU 🎉</td></tr>'}</table></div></div>
- </div>`}
+   <div class="card" id="dupbox"></div>
+ </div>`;dupView()}
 
  if(S.step===4){build();v.innerHTML=`<div class="card">
    <div class="card-head">
@@ -1268,7 +1306,7 @@ function list(){const q=S.q.toLowerCase(),all=items().filter(i=>stOf(i)===S.tab&
  $('#ls').innerHTML=body;$('#pgr').innerHTML=pager;$('#pgb').innerHTML=pagerB}
 
 // ---------- riwayat: simpan & muat ----------
-const HK=['step','fn','sel','lpkCol','namaCol','dec','nm','tab','q','pg'],HAPP='olah-data-list-nama';
+const HK=['step','fn','sel','lpkCol','namaCol','dec','ov','nm','tab','q','pg'],HAPP='olah-data-list-nama';
 const b64=buf=>new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result.split(',')[1]);fr.readAsDataURL(new Blob([buf]))});
 const unb64=s=>{const b=atob(s),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u.buffer};
 async function saveBlob(blob,fn){const d=window.claude&&await claude.use('downloads');if(d){await d.save({filename:fn,data:blob});return}
@@ -1288,11 +1326,28 @@ async function doSave(btn){let n=$('#mn').value.replace(/[\\\/:*?"<>|]+/g,'_').r
 async function loadSnap(f){toast('Membaca riwayat...');await pause();let d;
  try{d=JSON.parse(await f.text());if(d.app!==HAPP||!d.state)throw 0}catch(x){toast('File ini bukan file riwayat yang valid');return}
  if(!confirm('Muat riwayat "'+f.name+'"? Pekerjaan yang sekarang akan diganti.'))return;
- try{Object.assign(S,{step:0,sel:{},dec:{},nm:{},tab:'sug',q:'',pg:0,lpkCol:0,namaCol:0},d.state);
-  delete F.s;delete F.m;delete F.t;ws=undefined;hdr=[];rows=[];SEC=[];mou=[];src=new Set();srcInfo='';cache=null;R=null;$('#moul').innerHTML='';
+ try{Object.assign(S,{step:0,sel:{},dec:{},ov:{},nm:{},tab:'sug',q:'',pg:0,dt:'all',dq:'',dp:0,lpkCol:0,namaCol:0},d.state);
+  delete F.s;delete F.m;delete F.t;ws=undefined;hdr=[];rows=[];SEC=[];mou=[];src=new Set();srcBy=new Map();LK=null;srcInfo='';cache=null;R=null;$('#moul').innerHTML='';
   for(const k of['s','m','t']){if(d.files&&d.files[k]){F[k]=unb64(d.files[k]);put('f_'+k,F[k]);await parse(k)}else put('f_'+k,null)}
   if(S.step>0&&!ready(0))S.step=0;save();view();scrollTo(0,0);toast('Riwayat dimuat ✓ '+f.name)}
  catch(x){toast('Riwayat gagal dimuat, file mungkin rusak')}}
+
+
+// ---------- nama kembar: cek & tentukan sebelum unduh ----------
+const DPG=15;
+function dupView(){const b=$('#dupbox');if(!b||!R)return;const q=S.dq.toLowerCase(),cnt={all:R.dup.length,beda:0,sama:0,mirip:0,sumber:0},KL={beda:'beda LPK',sama:'sama LPK',mirip:'nama mirip',sumber:'mirip di sumber'};R.dup.forEach(d=>cnt[d.kind]++);
+ const all=R.dup.filter(d=>(S.dt==='all'||d.kind===S.dt)&&(!q||d.nm.toLowerCase().includes(q)||d.a.some(o=>String(o.d).toLowerCase().includes(q)||String(o.ol).toLowerCase().includes(q)))),pages=Math.max(1,Math.ceil(all.length/DPG));
+ if(S.dp>=pages)S.dp=pages-1;if(S.dp<0)S.dp=0;const st=S.dp*DPG,pg=all.slice(st,st+DPG),T=[['all','Semua'],['beda','Beda LPK'],['sama','Sama LPK'],['mirip','Mirip'],['sumber','Mirip sumber']],nm=Object.keys(S.ov).length;
+ const y=b.querySelector('.sc')?b.querySelector('.sc').scrollTop:0,fx=document.activeElement&&document.activeElement.id==='dq';
+ b.innerHTML=`<h3>${IC.table} Nama Kembar — Cek &amp; Tentukan <span class="tab-num">${R.dup.length}</span></h3>
+ <p class="mu" style="margin:4px 0 12px"><b>Beda LPK</b>: nama yang sama muncul di LPK berbeda. <b>Sama LPK</b>: nama yang sama muncul lebih dari sekali di satu LPK. <b>Mirip</b>: dua nama berbeda yang hampir sama (misalnya WIDIYANTO dan MOHAMAD WIDIYANTO). <b>Mirip sumber</b>: nama di target yang tidak cocok persis, tetapi mirip dengan nama di sheet sumber LPK-nya. Ketik atau pilih LPK tujuan (atau <b>UMUM</b>) lalu ketuk <b>Simpan</b>. Ungu otomatis hanya jika nama cocok dengan sheet sumber LPK tujuan.${nm?` <b>${nm}</b> baris sudah kamu tentukan manual.`:''}</p>
+ <div class="tabs">${T.map(([k,l])=>`<button class="${S.dt===k?'on':''}" data-a="dt" data-k="${k}"><span>${l}</span> <span class="tab-num">${cnt[k]}</span></button>`).join('')}</div>
+ <div class="search-wrap" style="margin:10px 0">${IC.search}<input type="text" id="dq" placeholder="Cari nama atau LPK..." value="${E(S.dq)}"></div>
+ <div class="sc tall"><table><tr><th>Nama di target</th><th>Baris</th><th>LPK di target</th><th>Posisi sekarang</th><th>Pindahkan ke</th></tr>${pg.map(d=>`<tr><td colspan="5" style="background:#f6f3ee"><b>${E(d.nm)}</b> <span class="row-pill">${d.a.length}x · ${KL[d.kind]}</span>${d.note?`<div class="mu" style="margin-top:2px">${E(d.note)}</div>`:''}</td></tr>`+d.a.map(o=>`<tr data-r="${o.r}"><td>${E(o.nm)}</td><td>${o.r}${o.sec?' <span class="mu">(HOLD)</span>':''}</td><td>${E(o.ol||'-')}</td><td><b>${E(o.d)}</b>${o.pu?' <span class="pu">ungu</span>':''}${S.ov[o.r]?' ✓ diubah':''}</td><td><div class="ed-in"><input type="text" list="moul" data-a="dv" placeholder="LPK MOU / UMUM" value="${E(S.ov[o.r]||'')}" autocomplete="off"><button class="sm" data-a="dsv">Simpan</button>${S.ov[o.r]?'<button class="g sm" data-a="drs">Reset</button>':''}</div></td></tr>`).join('')).join('')||'<tr><td colspan="5" class="mu" style="text-align:center;padding:18px">Tidak ada nama kembar 🎉</td></tr>'}</table></div>
+ ${pages>1?`<div class="pager"><button class="g sm" data-a="dpg" data-d="-1" ${S.dp===0?'disabled':''}>${IC.prev} Sebelumnya</button><span class="pager-info">Hal ${S.dp+1} / ${pages} · ${all.length} nama</span><button class="sm" data-a="dpg" data-d="1" ${S.dp>=pages-1?'disabled':''}>Berikutnya ${IC.next}</button></div>`:''}`;
+ const sc=b.querySelector('.sc');if(sc)sc.scrollTop=y;if(fx){const i=$('#dq');i.focus();i.setSelectionRange(i.value.length,i.value.length)}}
+function dupSet(r,x){x=String(x||'').trim();if(!x){delete S.ov[r]}else if(x.toUpperCase()==='UMUM')S.ov[r]='UMUM';else{const m=mou.find(m=>m.u===x.toUpperCase());if(!m){toast('Nama itu tidak ada di daftar MOU');return}S.ov[r]=m.n}
+ save();const y=scrollY,sc=$('#nonsc'),st=sc?sc.scrollTop:0,d=$('#dupbox').querySelector('.sc'),ds=d?d.scrollTop:0;view();scrollTo(0,y);const s2=$('#nonsc');if(s2)s2.scrollTop=st;const d2=$('#dupbox').querySelector('.sc');if(d2)d2.scrollTop=ds;toast(S.ov[r]?'Disimpan: baris '+r+' → '+S.ov[r]:'Keputusan baris '+r+' dihapus')}
 
 // ---------- ganti LPK langsung dari daftar langkah 4 ----------
 const edRow=n=>{const it=items().find(i=>i.v===n),sg=it&&it.sg;return`<tr class="ed-row" data-v="${E(n)}"><td colspan="3"><div class="ed">
@@ -1306,17 +1361,18 @@ function applyDec(v,x){x=String(x||'').trim();if(!x){toast('Ketik atau pilih nam
 // ---------- ekspor ----------
 const sName=(n,u)=>{let s=n.replace(/[\\\/?*\[\]:]/g,' ').replace(/\s+/g,' ').trim().slice(0,31)||'LPK',b=s,i=2;while(u.has(s.toLowerCase()))s=b.slice(0,28)+' '+i++;u.add(s.toLowerCase());return s};
 async function exportX(){const w=new ExcelJS.Workbook();await w.xlsx.load(F.t.slice(0));const A=w.getWorksheet('ALL')||w.worksheets[0],used=new Set(['all','umum','ringkasan']);
- const cols=Object.keys(S.sel).map(Number).filter(c=>S.sel[c]||c==S.lpkCol||c==S.namaCol).sort((a,b)=>a-b),li=cols.indexOf(S.lpkCol)+1,ni=cols.indexOf(S.namaCol)+1;
+ const RC=hdr.findIndex(h=>/REKOMENDASI SESEORANG/i.test(h||'')),cols=Object.keys(S.sel).map(Number).filter(c=>S.sel[c]||c==S.lpkCol||c==S.namaCol||c==RC).sort((a,b)=>a-b),li=cols.indexOf(S.lpkCol)+1,ni=cols.indexOf(S.namaCol)+1,ri=RC>0?cols.indexOf(RC)+1:0,isL=v=>/(^|[^A-Za-z0-9])LPK($|[^A-Za-z0-9])/i.test(String(v??'')),yel=c=>{if(isL(c.value))c.fill={type:'pattern',pattern:'solid',fgColor:{argb:YELLOW}}};
  const mk=(name,list,pu)=>{const n=w.addWorksheet(name);cols.forEach((c,i)=>{n.getColumn(i+1).width=A.getColumn(c).width||14});
   const cp=(sr,tr)=>{const r0=A.getRow(sr),t=n.getRow(tr);if(r0.height)t.height=r0.height;cols.forEach((c,i)=>{const s=r0.getCell(c),d=t.getCell(i+1);d.value=val(s);d.style=JSON.parse(JSON.stringify(s.style||{}))})};
   cp(1,1);let t=2;for(const sc of ['',...SEC]){const l=list.filter(o=>o.sec===sc);if(!l.length)continue;
    if(sc){if(t>2)t++;for(let i=1;i<=cols.length;i++)n.getCell(t,i).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFFE08A'}};const c=n.getCell(t,1);c.value=sc;c.font={bold:true,size:12};t++}
-   l.forEach(o=>{cp(o.r,t);n.getCell(t,li).value=o.lpk;if(pu&&o.pu)n.getCell(t,ni).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFB39DDB'}};t++})}
+   l.forEach(o=>{cp(o.r,t);n.getCell(t,li).value=o.lpk;if(ri)yel(n.getCell(t,ri));if(pu&&o.pu)n.getCell(t,ni).fill={type:'pattern',pattern:'solid',fgColor:{argb:PURPLE}};t++})}
   n.views=[{state:'frozen',ySplit:1}];n.autoFilter={from:{row:1,column:1},to:{row:Math.max(1,t-1),column:cols.length}}};
+ if(RC>0)for(let r=2;r<=A.rowCount;r++)yel(A.getRow(r).getCell(RC));
  mk('UMUM',R.um,false);R.names.forEach(n=>mk(sName(n,used),R.g[n],true));
- const s=w.addWorksheet('RINGKASAN');s.columns=[{width:46},{width:16},{width:22}];const H=r=>r.eachCell(c=>{c.font={bold:true};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFE0D8F7'}}});
- s.addRow(['RINGKASAN DATA MOU LPK']).font={bold:true,size:14};s.addRow(['LPK sudah MOU (punya data)',R.names.length]);s.addRow(['LPK MOU belum ada datanya',R.miss.length]);s.addRow(['Baris sisa di UMUM (belum MOU)',R.um.length]);s.addRow(['Nama ungu (sama dengan sumber)',R.purple]);s.addRow(['Baris HOLD yang ikut terbawa',R.hold]);
- s.addRow([]);H(s.addRow(['LPK SUDAH MOU','Jumlah baris','Nama ungu']));R.names.forEach(n=>s.addRow([n,R.g[n].length,R.g[n].filter(o=>o.pu).length]));
+ const s=w.addWorksheet('RINGKASAN');s.columns=[{width:46},{width:16},{width:22},{width:14},{width:14}];const H=r=>r.eachCell(c=>{c.font={bold:true};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFE0D8F7'}}});
+ s.addRow(['RINGKASAN DATA MOU LPK']).font={bold:true,size:14};s.addRow(['LPK sudah MOU (punya data)',R.names.length]);s.addRow(['LPK MOU belum ada datanya',R.miss.length]);s.addRow(['Baris sisa di UMUM (belum MOU)',R.um.length]);s.addRow(['Nama ungu (sama persis dengan sheet sumber LPK-nya)',R.purple]);s.addRow(['Nama dipindah ke LPK asli (sudah MOU)',R.mv]);s.addRow(['Nama tidak sinkron dipindah ke UMUM',R.rm]);s.addRow(['LPK yang punya baris HOLD',R.holdLpk]);s.addRow(['Baris HOLD yang ikut terbawa',R.hold]);
+ s.addRow([]);H(s.addRow(['LPK SUDAH MOU','Jumlah baris','Nama ungu','MASUK','HOLD']));R.names.forEach(n=>{const[a,b]=mh(R.g[n]);s.addRow([n,R.g[n].length,R.g[n].filter(o=>o.pu).length,a,b])});
  s.addRow([]);H(s.addRow(['LPK MOU TANPA DATA']));R.miss.forEach(n=>s.addRow([n]));
  s.addRow([]);H(s.addRow(['LPK BELUM MOU (di UMUM)','Jumlah baris']));R.non.forEach(r=>s.addRow(r));
  return new Blob([await w.xlsx.writeBuffer()],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'})}
@@ -1328,13 +1384,13 @@ document.addEventListener('drop',e=>{const d=e.target.closest('.drop');if(d)d.cl
 
 document.addEventListener('change',async e=>{const t=e.target;
  if(t.id==='hf'){const f=t.files[0];t.value='';if(f)await loadSnap(f)}
- else if(t.dataset.k){const f=t.files[0];if(!f)return;toast('Membaca '+f.name+'...');await pause();try{const b=await f.arrayBuffer();F[t.dataset.k]=b;S.nm[t.dataset.k]=f.name;put('f_'+t.dataset.k,b);await parse(t.dataset.k);save();toast('File terbaca ✓')}catch(x){toast('File gagal dibaca, pastikan format .xlsx')}view()}
+ else if(t.dataset.k){const f=t.files[0];if(!f)return;toast('Membaca '+f.name+'...');await pause();try{const b=await f.arrayBuffer();F[t.dataset.k]=b;S.nm[t.dataset.k]=f.name;if(t.dataset.k==='t')S.ov={};put('f_'+t.dataset.k,b);await parse(t.dataset.k);save();toast('File terbaca ✓')}catch(x){toast('File gagal dibaca, pastikan format .xlsx')}view()}
  else if(t.dataset.p){S[t.dataset.p]=+t.value;loadRows();save();view()}
  else if(t.dataset.c){S.sel[t.dataset.c]=t.checked;$('#cc').textContent=Object.values(S.sel).filter(Boolean).length+' kolom dipilih';save()}
  else if(t.dataset.a==='man'){const v=t.closest('.it').dataset.v,x=t.value.trim(),m=mou.find(m=>m.u===x.toUpperCase());if(!x)delete S.dec[v];else if(m)S.dec[v]=m.n;else toast('Nama itu tidak ada di MOU');save();lpkView()}
  else if(t.id==='fn'){S.fn=t.value.trim()||'Hasil_MOU_LPK';save()}});
 
-document.addEventListener('input',e=>{if(e.target.id==='q'){S.q=e.target.value;S.pg=0;list();$('#ls').scrollTop=0}});
+document.addEventListener('input',e=>{if(e.target.id==='q'){S.q=e.target.value;S.pg=0;list();$('#ls').scrollTop=0}else if(e.target.id==='dq'){S.dq=e.target.value;S.dp=0;dupView()}});
 document.addEventListener('keydown',e=>{if(!$('#md').hidden){if(e.key==='Escape')closeSave();else if(e.key==='Enter'&&e.target.id==='mn'){e.preventDefault();doSave($('#mc'))}return}
  const t=e.target;if(e.key==='Enter'&&t.dataset&&t.dataset.a==='rn'&&mou.some(m=>m.u===t.value.trim().toUpperCase())){e.preventDefault();applyDec(t.closest('.ed-row').dataset.v,t.value)}});
 
@@ -1349,6 +1405,10 @@ document.addEventListener('click',async e=>{const t=e.target.closest('[data-a],[
  else if(t.dataset.a==='pg'){S.pg+=+t.dataset.d;list();$('#ls').scrollTop=0}
  else if(t.dataset.a==='chg'){const tr=t.closest('tr'),v=tr.dataset.v,old=document.querySelector('.ed-row'),same=old&&old.dataset.v===v;if(old)old.remove();if(!same){tr.insertAdjacentHTML('afterend',edRow(v));const i=tr.nextElementSibling.querySelector('input');if(i)i.focus()}}
  else if(t.dataset.a==='cx'){t.closest('.ed-row').remove()}
+  else if(t.dataset.a==='dt'){S.dt=t.dataset.k;S.dp=0;dupView()}
+  else if(t.dataset.a==='dpg'){S.dp+=+t.dataset.d;dupView()}
+  else if(t.dataset.a==='dsv'){const tr=t.closest('tr');dupSet(tr.dataset.r,tr.querySelector('input').value)}
+  else if(t.dataset.a==='drs'){dupSet(t.closest('tr').dataset.r,'')}
  else if(t.dataset.a==='use'){applyDec(t.closest('tr').dataset.v,t.dataset.n)}
  else if(t.dataset.a==='sv'){const r=t.closest('.ed-row');applyDec(r.dataset.v,r.querySelector('input').value)}
  else if(t.dataset.a==='all'||t.dataset.a==='none'){hdr.forEach((h,c)=>{if(c)S.sel[c]=t.dataset.a==='all'});save();view()}
