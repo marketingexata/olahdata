@@ -1361,14 +1361,14 @@ function applyDec(v,x){x=String(x||'').trim();if(!x){toast('Ketik atau pilih nam
 // ---------- ekspor ----------
 const sName=(n,u)=>{let s=n.replace(/[\\\/?*\[\]:]/g,' ').replace(/\s+/g,' ').trim().slice(0,31)||'LPK',b=s,i=2;while(u.has(s.toLowerCase()))s=b.slice(0,28)+' '+i++;u.add(s.toLowerCase());return s};
 async function exportX(){const w=new ExcelJS.Workbook();await w.xlsx.load(F.t.slice(0));const A=w.getWorksheet('ALL')||w.worksheets[0],used=new Set(['all','umum','ringkasan']);
- const RC=hdr.findIndex(h=>/REKOMENDASI SESEORANG/i.test(h||'')),cols=Object.keys(S.sel).map(Number).filter(c=>S.sel[c]||c==S.lpkCol||c==S.namaCol||c==RC).sort((a,b)=>a-b),li=cols.indexOf(S.lpkCol)+1,ni=cols.indexOf(S.namaCol)+1,ri=RC>0?cols.indexOf(RC)+1:0,isL=v=>/(^|[^A-Za-z0-9])LPK($|[^A-Za-z0-9])/i.test(String(v??'')),yel=c=>{if(isL(c.value))c.fill={type:'pattern',pattern:'solid',fgColor:{argb:YELLOW}}};
+ const RC=hdr.findIndex(h=>/REKOMENDASI SESEORANG/i.test(h||'')),cols=Object.keys(S.sel).map(Number).filter(c=>S.sel[c]||c==S.lpkCol||c==S.namaCol).sort((a,b)=>a-b),li=cols.indexOf(S.lpkCol)+1,ni=cols.indexOf(S.namaCol)+1,ri=RC>0?cols.indexOf(RC)+1:0,isL=v=>/^\s*LPK\s*$/i.test(String(v??'')),yel=c=>{if(isL(c.value))c.style=Object.assign({},JSON.parse(JSON.stringify(c.style||{})),{fill:{type:'pattern',pattern:'solid',fgColor:{argb:YELLOW}}})};
  const mk=(name,list,pu)=>{const n=w.addWorksheet(name);cols.forEach((c,i)=>{n.getColumn(i+1).width=A.getColumn(c).width||14});
   const cp=(sr,tr)=>{const r0=A.getRow(sr),t=n.getRow(tr);if(r0.height)t.height=r0.height;cols.forEach((c,i)=>{const s=r0.getCell(c),d=t.getCell(i+1);d.value=val(s);d.style=JSON.parse(JSON.stringify(s.style||{}))})};
   cp(1,1);let t=2;for(const sc of ['',...SEC]){const l=list.filter(o=>o.sec===sc);if(!l.length)continue;
    if(sc){if(t>2)t++;for(let i=1;i<=cols.length;i++)n.getCell(t,i).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFFE08A'}};const c=n.getCell(t,1);c.value=sc;c.font={bold:true,size:12};t++}
    l.forEach(o=>{cp(o.r,t);n.getCell(t,li).value=o.lpk;if(ri)yel(n.getCell(t,ri));if(pu&&o.pu)n.getCell(t,ni).fill={type:'pattern',pattern:'solid',fgColor:{argb:PURPLE}};t++})}
   n.views=[{state:'frozen',ySplit:1}];n.autoFilter={from:{row:1,column:1},to:{row:Math.max(1,t-1),column:cols.length}}};
- if(RC>0)for(let r=2;r<=A.rowCount;r++)yel(A.getRow(r).getCell(RC));
+ if(RC>0&&S.sel[RC])for(let r=2;r<=A.rowCount;r++)yel(A.getRow(r).getCell(RC));
  mk('UMUM',R.um,false);R.names.forEach(n=>mk(sName(n,used),R.g[n],true));
  const s=w.addWorksheet('RINGKASAN');s.columns=[{width:46},{width:16},{width:22},{width:14},{width:14}];const H=r=>r.eachCell(c=>{c.font={bold:true};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFE0D8F7'}}});
  s.addRow(['RINGKASAN DATA MOU LPK']).font={bold:true,size:14};s.addRow(['LPK sudah MOU (punya data)',R.names.length]);s.addRow(['LPK MOU belum ada datanya',R.miss.length]);s.addRow(['Baris sisa di UMUM (belum MOU)',R.um.length]);s.addRow(['Nama ungu (sama persis dengan sheet sumber LPK-nya)',R.purple]);s.addRow(['Nama dipindah ke LPK asli (sudah MOU)',R.mv]);s.addRow(['Nama tidak sinkron dipindah ke UMUM',R.rm]);s.addRow(['LPK yang punya baris HOLD',R.holdLpk]);s.addRow(['Baris HOLD yang ikut terbawa',R.hold]);
