@@ -988,6 +988,43 @@ button.hbtn:hover:not(:disabled),label.hbtn:hover{background:rgba(255,255,255,.2
 .lpk-bottom:empty{display:none}
 .lpk-bottom .pager-mid{font-size:12.5px;font-weight:600;color:var(--mu);text-align:center;flex:1}
 .lpk-bottom button.sm{padding:8px 16px}
+
+/* Nama Kembar & Mirip */
+.dg{border:1px solid var(--bd);border-radius:14px;background:var(--cd);margin-bottom:10px;overflow:hidden}
+.dg.ok{border-color:#bfe6d4;background:var(--ol)}
+.dh{display:flex;align-items:center;gap:8px;padding:10px 12px;background:#f8f4ed;flex-wrap:wrap}
+.dh b{flex:1;min-width:140px;font-size:14px;word-break:break-word}
+.ib{width:26px;height:26px;min-width:26px;border-radius:50%;padding:0;border:1.5px solid var(--bd-s);background:#fff;color:var(--mu);font:italic 700 14px Georgia,serif;cursor:pointer}
+.ib.on{background:var(--pu);border-color:var(--pu);color:#fff}
+.di{display:none;padding:10px 12px;background:var(--wl);border-bottom:1px solid #f9e3b8;font-size:12.5px;line-height:1.6;color:var(--tx)}
+.di.open{display:block}
+.di ul{margin:6px 0 0;padding-left:18px}
+.dr{padding:10px 12px;border-top:1px solid var(--bd);display:grid;gap:6px}
+.dr .t{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.chip{font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:999px;background:#f3efe8;color:var(--mu)}
+.chip.u{background:#FF00FF;color:#fff}
+.chip.um{background:var(--wl);color:var(--wn)}
+.chip.ok{background:var(--ol);color:var(--ok)}
+
+.pbar{height:8px;border-radius:99px;background:#f0ebe2;overflow:hidden;margin-top:8px}
+.pbar i{display:block;height:100%;background:var(--ok);border-radius:99px;transition:width .25s}
+.lnk{background:none;border:0;padding:0;color:var(--pr);font-weight:600;font-size:12.5px;cursor:pointer;text-decoration:underline}
+.wz-q{padding:12px;font-size:15px;line-height:1.55;border-bottom:1px solid var(--bd)}
+.wz-act{padding:12px;display:grid;gap:10px;border-top:1px solid var(--bd)}
+.wz-done{text-align:center;padding:22px 12px;font-size:15px;font-weight:600}
+button.big{width:100%;padding:14px;font-size:15px;font-weight:700;border-radius:12px;border:0;cursor:pointer}
+button.big.ok{background:var(--ok);color:#fff}
+
+.kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+.kpi-i{border-radius:14px;padding:12px 14px;background:#fff;border:1px solid var(--bd);border-top:3px solid var(--pr)}
+.kpi-i b{display:block;font-size:24px;font-weight:700;letter-spacing:-.02em;line-height:1.15;color:var(--tx)}
+.kpi-i span{font-size:12px;font-weight:600;color:var(--mu)}
+.kpi-i.k2{border-top-color:#3b6fe0}.kpi-i.k3{border-top-color:var(--pu)}.kpi-i.k4{border-top-color:var(--wn)}
+.pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.pill{font-size:12px;font-weight:600;padding:5px 12px;border-radius:999px;background:#f5f0e8;color:var(--mu)}
+.pill b{color:var(--tx)}
+.pill.ok{background:var(--ol);color:var(--ok)}.pill.wn{background:var(--wl);color:var(--wn)}
+@media(max-width:620px){.kpi{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
@@ -1054,7 +1091,7 @@ button.hbtn:hover:not(:disabled),label.hbtn:hover{background:rgba(255,255,255,.2
 
 <script>
 const $=s=>document.querySelector(s),E=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const S={step:0,fn:'Hasil_MOU_LPK',sel:{},lpkCol:0,namaCol:0,dec:{},ov:{},nm:{},tab:'sug',q:'',pg:0,dt:'all',dq:'',dp:0},F={};
+const S={step:0,fn:'Hasil_MOU_LPK',sel:{},lpkCol:0,namaCol:0,dec:{},ov:{},dk:{},dh:false,dm:'wiz',dwi:0,dwz:'',nm:{},tab:'sug',q:'',pg:0,dt:'all',dq:'',dp:0},F={};
 let SIMP=null,SC=new Map(),SEC=[],ws,hdr=[],rows=[],mou=[],src=new Set(),srcBy=new Map(),LK=null,srcInfo='',cache=null,R=null;
 const PURPLE='FFFF00FF',YELLOW='FFFFFF00';
 const NAMES=['Impor','UMUM','Nama LPK','Pecah','Unduh'];
@@ -1088,7 +1125,7 @@ const toast=t=>{const e=$('#toast');e.textContent=t;e.classList.add('on');clearT
 const idb=()=>new Promise((a,b)=>{const q=indexedDB.open('moudash',1);q.onupgradeneeded=()=>q.result.createObjectStore('kv');q.onsuccess=()=>a(q.result);q.onerror=()=>b(q.error)});
 const put=async(k,v)=>{try{(await idb()).transaction('kv','readwrite').objectStore('kv').put(v,k)}catch(e){}};
 const get=async k=>{try{const d=await idb();return await new Promise(r=>{const q=d.transaction('kv').objectStore('kv').get(k);q.onsuccess=()=>r(q.result);q.onerror=()=>r()})}catch(e){}};
-const save=()=>{put('st',{step:S.step,fn:S.fn,sel:S.sel,lpkCol:S.lpkCol,namaCol:S.namaCol,dec:S.dec,ov:S.ov,nm:S.nm});$('#sv').innerHTML=IC.cloudOk+' Tersimpan'};
+const save=()=>{put('st',{step:S.step,fn:S.fn,sel:S.sel,lpkCol:S.lpkCol,namaCol:S.namaCol,dec:S.dec,ov:S.ov,dk:S.dk,dh:S.dh,dm:S.dm,nm:S.nm});$('#sv').innerHTML=IC.cloudOk+' Tersimpan'};
 const val=c=>{let v=c.value;if(v&&typeof v==='object'&&!(v instanceof Date)){v=v.result!==undefined?v.result:v.richText?v.richText.map(t=>t.text).join(''):v.text!==undefined?v.text:null;if(v&&typeof v==='object')v=null}return v};
 const pause=()=>new Promise(r=>setTimeout(r,40));
 
@@ -1160,7 +1197,7 @@ function build(){const m=new Map(mou.map(x=>[x.u,x.n])),g={},um=[];let n=0,mv=0,
  const names=Object.keys(g).sort((a,b)=>a.localeCompare(b));
 const gr=new Map();const add=(o,d)=>{const z=nz(o.nm);if(!z)return;o.d=d;if(!gr.has(z))gr.set(z,[]);gr.get(z).push(o)};
  names.forEach(k=>g[k].forEach(o=>add(o,k)));um.forEach(o=>add(o,'UMUM'));
- const d0=[...gr].filter(([z,a])=>a.length>1).map(([z,a])=>({z,nm:a[0].nm,a,kind:new Set(a.map(o=>o.d)).size>1?'beda':'sama'})).sort((x,y)=>(x.kind===y.kind?0:x.kind==='beda'?-1:1)||x.nm.localeCompare(y.nm,'id'));
+ const d0=[...gr].filter(([z,a])=>a.length>1).map(([z,a])=>({z,nm:a[0].nm,a,kind:new Set(a.map(o=>String(S.dec[o.ol]||o.ol||'').trim().toUpperCase())).size>1?'beda':'sama'})).sort((x,y)=>(x.kind===y.kind?0:x.kind==='beda'?-1:1)||x.nm.localeCompare(y.nm,'id'));
  const ex=[];simPairs().forEach(([a,b])=>{const A=gr.get(a),B=gr.get(b);if(A&&B)ex.push({z:a+'|'+b,nm:A[0].nm+' ≈ '+B[0].nm,a:[...A,...B],kind:'mirip'})});
  const ss=[];[...names.flatMap(k=>g[k]),...um].forEach(o=>{if(o.cand&&o.cand.length)ss.push({z:'s'+o.r,nm:o.nm,a:[o],kind:'sumber',note:'Mirip di sumber ('+o.ck+'): '+o.cand.slice(0,3).join(', ')+(o.cand.length>3?' …':'')})});
  const srt=(x,y)=>x.nm.localeCompare(y.nm,'id');const dup=[...d0,...ex.sort(srt),...ss.sort(srt)];
@@ -1244,18 +1281,19 @@ function view(){steps();const v=$('#v');
 
  if(S.step===3){build();v.innerHTML=`<div class="card">
    <div class="card-head">
-     <div class="card-title"><div class="card-icon">${IC.split}</div><div><h2>4. Hasil Pemecahan Data</h2><p class="mu">Sheet LPK MOU disusun urut A–Z mulai sheet ke-3. Baris di bawah judul HOLD ikut terbawa, dan nama ditandai <span class="pu">${IC.spark} ungu</span> hanya jika sama persis dengan sheet sumber LPK yang sama. Nama yang tidak sinkron dipindah ke LPK aslinya (bila sudah MOU) atau ke UMUM.</p></div></div>
+     <div class="card-title"><div class="card-icon">${IC.split}</div><div><h2>4. Hasil Pemecahan Data</h2><p class="mu">Sheet LPK disusun A–Z mulai sheet ke-3, baris HOLD ikut terbawa. Nama <span class="pu">${IC.spark} ungu</span> = sama persis dengan sheet sumber LPK-nya. Yang tidak sinkron dipindah ke LPK aslinya atau ke UMUM.</p></div></div>
    </div>
-   <div class="stat">
-     <div class="stat-box"><b>${R.names.length}</b>LPK sudah MOU<span class="stat-ico">${IC.mou}</span></div>
-     <div class="stat-box"><b>${R.miss.length}</b>MOU tanpa data<span class="stat-ico">${IC.cols}</span></div>
-     <div class="stat-box"><b>${R.um.length}</b>Baris sisa UMUM<span class="stat-ico">${IC.src}</span></div>
-     <div class="stat-box"><b>${R.purple}</b>Nama ungu<span class="stat-ico">${IC.spark}</span></div>
-     <div class="stat-box"><b>${R.hold}</b>Baris HOLD terbawa<span class="stat-ico">${IC.split}</span></div>
-     <div class="stat-box"><b>${R.holdLpk}</b>LPK punya HOLD<span class="stat-ico">${IC.mou}</span></div>
-     <div class="stat-box"><b>${R.mv}</b>Dipindah ke LPK asli<span class="stat-ico">${IC.match}</span></div>
-     <div class="stat-box"><b>${R.rm}</b>Tak sinkron → UMUM<span class="stat-ico">${IC.src}</span></div>
-     <div class="stat-box"><b>${R.chk?'Aman':'Periksa'}</b>Cek duplikasi UMUM<span class="stat-ico">${IC.checkCircle}</span></div>
+   <div class="kpi">
+     <div class="kpi-i k1"><b>${R.names.length}</b><span>LPK jadi sheet</span></div>
+     <div class="kpi-i k2"><b>${R.um.length}</b><span>Baris di UMUM</span></div>
+     <div class="kpi-i k3"><b>${R.purple}</b><span>Nama ungu</span></div>
+     <div class="kpi-i k4"><b>${R.hold}</b><span>Baris HOLD${R.holdLpk?` · ${R.holdLpk} LPK`:''}</span></div>
+   </div>
+   <div class="pills">
+     <span class="pill"><b>${R.miss.length}</b> MOU tanpa data</span>
+     <span class="pill"><b>${R.mv}</b> dipindah ke LPK asli</span>
+     <span class="pill"><b>${R.rm}</b> tak sinkron → UMUM</span>
+     <span class="pill ${R.chk?'ok':'wn'}">${R.chk?'✓ Duplikasi UMUM aman':'⚠ Periksa duplikasi UMUM'}</span>
    </div>
  </div>
  <div class="grid" style="grid-template-columns:1fr">
@@ -1306,7 +1344,7 @@ function list(){const q=S.q.toLowerCase(),all=items().filter(i=>stOf(i)===S.tab&
  $('#ls').innerHTML=body;$('#pgr').innerHTML=pager;$('#pgb').innerHTML=pagerB}
 
 // ---------- riwayat: simpan & muat ----------
-const HK=['step','fn','sel','lpkCol','namaCol','dec','ov','nm','tab','q','pg'],HAPP='olah-data-list-nama';
+const HK=['step','fn','sel','lpkCol','namaCol','dec','ov','dk','dh','dm','nm','tab','q','pg'],HAPP='olah-data-list-nama';
 const b64=buf=>new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result.split(',')[1]);fr.readAsDataURL(new Blob([buf]))});
 const unb64=s=>{const b=atob(s),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u.buffer};
 async function saveBlob(blob,fn){const d=window.claude&&await claude.use('downloads');if(d){await d.save({filename:fn,data:blob});return}
@@ -1326,7 +1364,7 @@ async function doSave(btn){let n=$('#mn').value.replace(/[\\\/:*?"<>|]+/g,'_').r
 async function loadSnap(f){toast('Membaca riwayat...');await pause();let d;
  try{d=JSON.parse(await f.text());if(d.app!==HAPP||!d.state)throw 0}catch(x){toast('File ini bukan file riwayat yang valid');return}
  if(!confirm('Muat riwayat "'+f.name+'"? Pekerjaan yang sekarang akan diganti.'))return;
- try{Object.assign(S,{step:0,sel:{},dec:{},ov:{},nm:{},tab:'sug',q:'',pg:0,dt:'all',dq:'',dp:0,lpkCol:0,namaCol:0},d.state);
+ try{Object.assign(S,{step:0,sel:{},dec:{},ov:{},dk:{},dh:false,dm:'wiz',dwi:0,nm:{},tab:'sug',q:'',pg:0,dt:'all',dq:'',dp:0,lpkCol:0,namaCol:0},d.state);
   delete F.s;delete F.m;delete F.t;ws=undefined;hdr=[];rows=[];SEC=[];mou=[];src=new Set();srcBy=new Map();LK=null;srcInfo='';cache=null;R=null;$('#moul').innerHTML='';
   for(const k of['s','m','t']){if(d.files&&d.files[k]){F[k]=unb64(d.files[k]);put('f_'+k,F[k]);await parse(k)}else put('f_'+k,null)}
   if(S.step>0&&!ready(0))S.step=0;save();view();scrollTo(0,0);toast('Riwayat dimuat ✓ '+f.name)}
@@ -1334,18 +1372,60 @@ async function loadSnap(f){toast('Membaca riwayat...');await pause();let d;
 
 
 // ---------- nama kembar: cek & tentukan sebelum unduh ----------
-const DPG=15;
-function dupView(){const b=$('#dupbox');if(!b||!R)return;const q=S.dq.toLowerCase(),cnt={all:R.dup.length,beda:0,sama:0,mirip:0,sumber:0},KL={beda:'beda LPK',sama:'sama LPK',mirip:'nama mirip',sumber:'mirip di sumber'};R.dup.forEach(d=>cnt[d.kind]++);
- const all=R.dup.filter(d=>(S.dt==='all'||d.kind===S.dt)&&(!q||d.nm.toLowerCase().includes(q)||d.a.some(o=>String(o.d).toLowerCase().includes(q)||String(o.ol).toLowerCase().includes(q)))),pages=Math.max(1,Math.ceil(all.length/DPG));
- if(S.dp>=pages)S.dp=pages-1;if(S.dp<0)S.dp=0;const st=S.dp*DPG,pg=all.slice(st,st+DPG),T=[['all','Semua'],['beda','Beda LPK'],['sama','Sama LPK'],['mirip','Mirip'],['sumber','Mirip sumber']],nm=Object.keys(S.ov).length;
- const y=b.querySelector('.sc')?b.querySelector('.sc').scrollTop:0,fx=document.activeElement&&document.activeElement.id==='dq';
- b.innerHTML=`<h3>${IC.table} Nama Kembar — Cek &amp; Tentukan <span class="tab-num">${R.dup.length}</span></h3>
- <p class="mu" style="margin:4px 0 12px"><b>Beda LPK</b>: nama yang sama muncul di LPK berbeda. <b>Sama LPK</b>: nama yang sama muncul lebih dari sekali di satu LPK. <b>Mirip</b>: dua nama berbeda yang hampir sama (misalnya WIDIYANTO dan MOHAMAD WIDIYANTO). <b>Mirip sumber</b>: nama di target yang tidak cocok persis, tetapi mirip dengan nama di sheet sumber LPK-nya. Ketik atau pilih LPK tujuan (atau <b>UMUM</b>) lalu ketuk <b>Simpan</b>. Ungu otomatis hanya jika nama cocok dengan sheet sumber LPK tujuan.${nm?` <b>${nm}</b> baris sudah kamu tentukan manual.`:''}</p>
+const DPG=10,DI=new Set();
+function dupInfo(d){const nmz=o=>nz(o.nm),u=a=>[...new Set(a)],B=x=>`<b>${E(x)}</b>`,n=d.a.length,lp=u(d.a.map(rl)),names=u(d.a.map(o=>o.nm));
+ const intro={beda:`Nama ${B(d.a[0].nm)} muncul ${n}x di LPK berbeda: ${lp.map(B).join(', ')}. Apakah benar?`,
+  sama:`Nama ${B(d.a[0].nm)} muncul ${n}x di LPK ${B(lp[0])}. Apakah benar atau data ganda?`,
+  mirip:`Nama ${names.map(B).join(' dan ')} hampir sama. Apakah benar orang yang sama?`,
+  sumber:`Nama ${B(d.a[0].nm)} (LPK ${B(d.a[0].ol||'-')}) tidak sama persis dengan sumber, tetapi mirip dengan ${(d.a[0].cand||[]).slice(0,3).map(B).join(', ')} di sheet sumber ${B(d.a[0].ck||'-')}. Apakah orang yang sama?`}[d.kind];
+ const pu=d.a.filter(o=>o.pu),um=d.a.filter(o=>o.d==='UMUM'),lk={};d.a.filter(o=>o.d!=='UMUM').forEach(o=>(lk[o.d]=lk[o.d]||[]).push(o.nm));
+ const sr=names.map(x=>{const sh=[...srcBy].filter(([k,st])=>st.has(nz({nm:x}.nm))).map(([k])=>k);return `${B(x)} → ${sh.length?'sheet '+sh.slice(0,3).map(E).join(', '):'tidak ada di sumber'}`});
+ return `<div>${intro}</div><ul>
+ <li>Bagian <span class="chip u">ungu</span>: ${pu.length?pu.map(o=>`nama ${B(o.nm)} dari LPK ${B(o.d)}`).join('; ')+' (sama persis dengan sumber)':'belum ada, tidak ada yang sama persis dengan sumber'}.</li>
+ <li>Excel target: ${d.a.map(o=>`${B(o.nm)} (LPK ${E(o.ol||'-')})`).join('; ')}.</li>
+ <li>Excel sumber: ${sr.join('; ')}.</li>
+ <li>Masuk <b>UMUM</b>: ${um.length?um.map(o=>`nama ${B(o.nm)} dari LPK ${B(o.ol||'-')}`).join('; '):'tidak ada'}.</li>
+ <li>Masuk sheet LPK: ${Object.keys(lk).length?Object.entries(lk).map(([k,v])=>`${B(k)} → nama ${v.map(B).join(', ')}`).join('; '):'tidak ada'}.</li></ul>
+ <div style="margin-top:6px">Abaikan jika sudah benar, ubah jika ada kesalahan.</div>`}
+function dupList(){const b=$('#dupbox');if(!b||!R)return;const q=S.dq.toLowerCase(),cnt={all:R.dup.length,beda:0,sama:0,mirip:0,sumber:0},KL={beda:'Beda LPK',sama:'Sama LPK',mirip:'Mirip',sumber:'Mirip sumber'};R.dup.forEach(d=>cnt[d.kind]++);
+ const done=R.dup.filter(d=>S.dk[d.z]).length,all=R.dup.filter(d=>(S.dt==='all'||d.kind===S.dt)&&!(S.dh&&S.dk[d.z])&&(!q||d.nm.toLowerCase().includes(q)||d.a.some(o=>String(o.d).toLowerCase().includes(q)||String(o.ol).toLowerCase().includes(q)))),pages=Math.max(1,Math.ceil(all.length/DPG));
+ if(S.dp>=pages)S.dp=pages-1;if(S.dp<0)S.dp=0;const pg=all.slice(S.dp*DPG,S.dp*DPG+DPG),T=[['all','Semua'],['beda','Beda LPK'],['sama','Sama LPK'],['mirip','Mirip'],['sumber','Mirip sumber']],nm=Object.keys(S.ov).length;
+ const sc0=b.querySelector('.sc'),y=sc0?sc0.scrollTop:0,fx=document.activeElement&&document.activeElement.id==='dq';
+ const row=o=>`<div class="dr" data-r="${o.r}"><div class="t"><b>${E(o.nm)}</b><span class="chip">Baris ${o.r}${o.sec?' · HOLD':''}</span></div>
+  <div class="t mu">Di target: <b>${E(o.ol||'-')}</b> <span>→</span> Sekarang: ${o.d==='UMUM'?'<span class="chip um">UMUM</span>':`<span class="chip${o.pu?' u':''}">${E(o.d)}${o.pu?' · ungu':''}</span>`}${S.ov[o.r]?' <span class="chip ok">✓ kamu ubah</span>':''}</div>
+  <div class="ed-in"><input type="text" list="moul" data-a="dv" placeholder="Pindahkan ke LPK MOU / UMUM" value="${E(S.ov[o.r]||'')}" autocomplete="off"><button class="sm" data-a="dsv">Simpan</button>${S.ov[o.r]?'<button class="g sm" data-a="drs">Reset</button>':''}</div></div>`;
+ b.innerHTML=`<h3>${IC.table} Nama Kembar &amp; Mirip <span class="tab-num">${done} / ${R.dup.length} dicek</span></h3>
+ <p class="mu" style="margin:4px 0 10px"><button class="lnk" data-a="dm" data-k="wiz">← Kembali ke tampilan satu-satu</button><br>Ketuk <b>i</b> untuk penjelasan tiap nama. Kalau sudah benar, tandai <b>Sudah dicek</b>. Kalau salah, ketik LPK tujuan lalu <b>Simpan</b>.${nm?` (${nm} baris diubah manual)`:''}</p>
  <div class="tabs">${T.map(([k,l])=>`<button class="${S.dt===k?'on':''}" data-a="dt" data-k="${k}"><span>${l}</span> <span class="tab-num">${cnt[k]}</span></button>`).join('')}</div>
- <div class="search-wrap" style="margin:10px 0">${IC.search}<input type="text" id="dq" placeholder="Cari nama atau LPK..." value="${E(S.dq)}"></div>
- <div class="sc tall"><table><tr><th>Nama di target</th><th>Baris</th><th>LPK di target</th><th>Posisi sekarang</th><th>Pindahkan ke</th></tr>${pg.map(d=>`<tr><td colspan="5" style="background:#f6f3ee"><b>${E(d.nm)}</b> <span class="row-pill">${d.a.length}x · ${KL[d.kind]}</span>${d.note?`<div class="mu" style="margin-top:2px">${E(d.note)}</div>`:''}</td></tr>`+d.a.map(o=>`<tr data-r="${o.r}"><td>${E(o.nm)}</td><td>${o.r}${o.sec?' <span class="mu">(HOLD)</span>':''}</td><td>${E(o.ol||'-')}</td><td><b>${E(o.d)}</b>${o.pu?' <span class="pu">ungu</span>':''}${S.ov[o.r]?' ✓ diubah':''}</td><td><div class="ed-in"><input type="text" list="moul" data-a="dv" placeholder="LPK MOU / UMUM" value="${E(S.ov[o.r]||'')}" autocomplete="off"><button class="sm" data-a="dsv">Simpan</button>${S.ov[o.r]?'<button class="g sm" data-a="drs">Reset</button>':''}</div></td></tr>`).join('')).join('')||'<tr><td colspan="5" class="mu" style="text-align:center;padding:18px">Tidak ada nama kembar 🎉</td></tr>'}</table></div>
- ${pages>1?`<div class="pager"><button class="g sm" data-a="dpg" data-d="-1" ${S.dp===0?'disabled':''}>${IC.prev} Sebelumnya</button><span class="pager-info">Hal ${S.dp+1} / ${pages} · ${all.length} nama</span><button class="sm" data-a="dpg" data-d="1" ${S.dp>=pages-1?'disabled':''}>Berikutnya ${IC.next}</button></div>`:''}`;
+ <div class="ed-in" style="margin:10px 0"><div class="search-wrap" style="flex:1;min-width:200px">${IC.search}<input type="text" id="dq" placeholder="Cari nama atau LPK..." value="${E(S.dq)}"></div><button class="g sm" data-a="dh">${S.dh?'Tampilkan semua':'Sembunyikan yang sudah dicek'}</button></div>
+ <div class="sc tall">${pg.map(d=>`<div class="dg${S.dk[d.z]?' ok':''}"><div class="dh"><span class="chip">${KL[d.kind]}</span><b>${E(d.nm)}</b><button class="ib${DI.has(d.z)?' on':''}" data-a="di" data-z="${E(d.z)}" title="Penjelasan">i</button><button class="g sm" data-a="dok" data-z="${E(d.z)}">${S.dk[d.z]?'✓ Sudah dicek':'Tandai dicek'}</button></div>
+  <div class="di${DI.has(d.z)?' open':''}">${dupInfo(d)}</div>${d.a.map(row).join('')}</div>`).join('')||'<div class="mu" style="text-align:center;padding:18px">Tidak ada yang perlu dicek 🎉</div>'}</div>
+ ${pages>1?`<div class="pager"><button class="g sm" data-a="dpg" data-d="-1" ${S.dp===0?'disabled':''}>${IC.prev} Sebelumnya</button><span class="pager-info">Hal ${S.dp+1} / ${pages} · ${all.length} item</span><button class="sm" data-a="dpg" data-d="1" ${S.dp>=pages-1?'disabled':''}>Berikutnya ${IC.next}</button></div>`:''}`;
  const sc=b.querySelector('.sc');if(sc)sc.scrollTop=y;if(fx){const i=$('#dq');i.focus();i.setSelectionRange(i.value.length,i.value.length)}}
+const rl=o=>S.dec[o.ol]||o.ol||'-',nl=x=>String(x||'-').replace(/^LPK\s+/i,''),why=o=>o.m?'sesuai pilihanmu':o.d==='UMUM'?(o.x?`namanya tidak ditemukan di data sumber LPK ${o.ck||o.ol||'-'}`:`LPK ${nl(rl(o))} belum MOU`):o.pu?'namanya sama persis dengan data sumber LPK itu (diberi warna ungu)':'LPK ini tidak punya data sumber untuk dicek (tanpa warna ungu)';
+function dupWiz(){const b=$('#dupbox');if(!b||!R)return;const Q=R.dup.filter(d=>!S.dk[d.z]),tot=R.dup.length,done=tot-Q.length,B=x=>`<b>${E(x)}</b>`;
+ const head=`<h3>${IC.table} Cek Nama Kembar <span class="tab-num">${done} / ${tot} selesai</span></h3><div class="pbar"><i style="width:${tot?Math.round(done/tot*100):0}%"></i></div>
+ <p class="mu" style="margin:8px 0 12px;font-size:12.5px">Cek satu per satu. Kalau sudah benar, tekan tombol hijau. <button class="lnk" data-a="dm" data-k="list">Ganti ke tampilan daftar</button></p>`;
+ if(!tot){b.innerHTML=head+'<div class="wz-done">Tidak ada nama kembar atau mirip 🎉</div>';return}
+ if(!Q.length){b.innerHTML=head+`<div class="wz-done">Semua sudah dicek 🎉<br><span class="mu">Kamu bisa lanjut mengunduh hasilnya.</span><div style="margin-top:12px"><button class="g sm" data-a="dre">Cek ulang dari awal</button></div></div>`;return}
+ if(!S.dwz){if(S.dwi>=Q.length)S.dwi=0;if(S.dwi<0)S.dwi=Q.length-1}let ix=S.dwz?Q.findIndex(x=>x.z===S.dwz):-1;if(ix<0)ix=Math.min(Math.max(S.dwi,0),Q.length-1);S.dwi=ix;const d=Q[ix];S.dwz=d.z;const n=d.a.length,names=[...new Set(d.a.map(o=>o.nm))],lp=[...new Set(d.a.map(rl))];
+ const T={beda:'Nama yang sama di LPK berbeda',sama:'Nama tercatat lebih dari sekali',mirip:'Dua nama yang hampir sama',sumber:'Nama tidak persis sama dengan data sumber'}[d.kind];
+ const Qn={beda:`Nama ${B(d.a[0].nm)} muncul di <b>${lp.length} LPK berbeda</b>. Apakah ini memang orang yang berbeda?`,
+  sama:`Nama ${B(d.a[0].nm)} tercatat <b>${n} kali</b> di LPK ${B(lp[0])}. Apakah ini data ganda?`,
+  mirip:`Nama ${names.map(B).join(' dan ')} hampir sama. Apakah ini orang yang sama?`,
+  sumber:`Nama ${B(d.a[0].nm)} (LPK ${B(d.a[0].ol||'-')}) tidak sama persis dengan data sumber. Di sumber ada nama yang mirip: ${(d.a[0].cand||[]).slice(0,3).map(B).join(', ')}. Apakah ini orang yang sama?`}[d.kind];
+ const tip={beda:'Kalau memang orang berbeda, tidak perlu diubah.',sama:'Kalau memang ganda, pindahkan salah satunya.',mirip:'Kalau orang yang sama, pastikan keduanya masuk LPK yang benar.',sumber:'Kalau orang yang sama, pastikan LPK-nya sudah benar.'}[d.kind];
+ const row=(o,i)=>`<div class="dr" data-r="${o.r}"><div class="t"><span class="chip">Orang ${i+1}</span><b>${E(o.nm)}</b></div>
+  <div class="mu">LPK di file target: <b>${E(o.ol||'-')}</b> · baris ${o.r}${o.sec?' (HOLD)':''}</div>
+  <div>Akan masuk ke: ${o.d==='UMUM'?'<span class="chip um">UMUM</span>':`<span class="chip${o.pu?' u':''}">sheet ${E(o.d)}</span>`}<div class="mu" style="margin-top:3px">Alasan: ${E(why(o))}.</div></div>
+  <div class="mu" style="font-size:12px">Kalau salah, pindahkan ke:</div>
+  <div class="ed-in"><button class="g sm" data-a="dum">UMUM</button><input type="text" list="moul" data-a="dv" placeholder="atau ketik nama LPK..." value="${S.ov[o.r]&&S.ov[o.r]!=='UMUM'?E(S.ov[o.r]):''}" autocomplete="off"><button class="sm" data-a="dsv">Pindahkan</button>${S.ov[o.r]?'<button class="g sm" data-a="drs">Kembalikan</button>':''}</div>${S.ov[o.r]?`<span class="chip ok">✓ sudah kamu pindahkan ke ${E(S.ov[o.r])}</span>`:''}</div>`;
+ b.innerHTML=head+`<div class="dg wz"><div class="dh"><span class="chip">Kasus ${S.dwi+1} dari ${Q.length}</span><b>${T}</b></div>
+  <div class="wz-q">${Qn}<div class="mu" style="margin-top:4px">${tip}</div></div>${d.a.map(row).join('')}
+  <div class="wz-act"><button class="big ok" data-a="dgd" data-z="${E(d.z)}">✓ Sudah benar, lanjut</button>
+  <div class="ed-in"><button class="g sm" data-a="dpv">← Sebelumnya</button><button class="g sm" data-a="dnx">Lewati dulu →</button><button class="ib${DI.has(d.z)?' on':''}" data-a="di" data-z="${E(d.z)}" title="Penjelasan lengkap">i</button></div></div>
+  <div class="di${DI.has(d.z)?' open':''}">${dupInfo(d)}</div></div>`}
+function dupView(){S.dm==='list'?dupList():dupWiz()}
 function dupSet(r,x){x=String(x||'').trim();if(!x){delete S.ov[r]}else if(x.toUpperCase()==='UMUM')S.ov[r]='UMUM';else{const m=mou.find(m=>m.u===x.toUpperCase());if(!m){toast('Nama itu tidak ada di daftar MOU');return}S.ov[r]=m.n}
  save();const y=scrollY,sc=$('#nonsc'),st=sc?sc.scrollTop:0,d=$('#dupbox').querySelector('.sc'),ds=d?d.scrollTop:0;view();scrollTo(0,y);const s2=$('#nonsc');if(s2)s2.scrollTop=st;const d2=$('#dupbox').querySelector('.sc');if(d2)d2.scrollTop=ds;toast(S.ov[r]?'Disimpan: baris '+r+' → '+S.ov[r]:'Keputusan baris '+r+' dihapus')}
 
@@ -1384,7 +1464,7 @@ document.addEventListener('drop',e=>{const d=e.target.closest('.drop');if(d)d.cl
 
 document.addEventListener('change',async e=>{const t=e.target;
  if(t.id==='hf'){const f=t.files[0];t.value='';if(f)await loadSnap(f)}
- else if(t.dataset.k){const f=t.files[0];if(!f)return;toast('Membaca '+f.name+'...');await pause();try{const b=await f.arrayBuffer();F[t.dataset.k]=b;S.nm[t.dataset.k]=f.name;if(t.dataset.k==='t')S.ov={};put('f_'+t.dataset.k,b);await parse(t.dataset.k);save();toast('File terbaca ✓')}catch(x){toast('File gagal dibaca, pastikan format .xlsx')}view()}
+ else if(t.dataset.k){const f=t.files[0];if(!f)return;toast('Membaca '+f.name+'...');await pause();try{const b=await f.arrayBuffer();F[t.dataset.k]=b;S.nm[t.dataset.k]=f.name;if(t.dataset.k==='t'){S.ov={};S.dk={}}put('f_'+t.dataset.k,b);await parse(t.dataset.k);save();toast('File terbaca ✓')}catch(x){toast('File gagal dibaca, pastikan format .xlsx')}view()}
  else if(t.dataset.p){S[t.dataset.p]=+t.value;loadRows();save();view()}
  else if(t.dataset.c){S.sel[t.dataset.c]=t.checked;$('#cc').textContent=Object.values(S.sel).filter(Boolean).length+' kolom dipilih';save()}
  else if(t.dataset.a==='man'){const v=t.closest('.it').dataset.v,x=t.value.trim(),m=mou.find(m=>m.u===x.toUpperCase());if(!x)delete S.dec[v];else if(m)S.dec[v]=m.n;else toast('Nama itu tidak ada di MOU');save();lpkView()}
@@ -1405,10 +1485,19 @@ document.addEventListener('click',async e=>{const t=e.target.closest('[data-a],[
  else if(t.dataset.a==='pg'){S.pg+=+t.dataset.d;list();$('#ls').scrollTop=0}
  else if(t.dataset.a==='chg'){const tr=t.closest('tr'),v=tr.dataset.v,old=document.querySelector('.ed-row'),same=old&&old.dataset.v===v;if(old)old.remove();if(!same){tr.insertAdjacentHTML('afterend',edRow(v));const i=tr.nextElementSibling.querySelector('input');if(i)i.focus()}}
  else if(t.dataset.a==='cx'){t.closest('.ed-row').remove()}
+  else if(t.dataset.a==='di'){const z=t.dataset.z;DI.has(z)?DI.delete(z):DI.add(z);t.classList.toggle('on');t.closest('.dg').querySelector('.di').classList.toggle('open')}
+  else if(t.dataset.a==='dok'){const z=t.dataset.z;S.dk[z]?delete S.dk[z]:S.dk[z]=1;save();dupView()}
+  else if(t.dataset.a==='dh'){S.dh=!S.dh;S.dp=0;save();dupView()}
   else if(t.dataset.a==='dt'){S.dt=t.dataset.k;S.dp=0;dupView()}
   else if(t.dataset.a==='dpg'){S.dp+=+t.dataset.d;dupView()}
-  else if(t.dataset.a==='dsv'){const tr=t.closest('tr');dupSet(tr.dataset.r,tr.querySelector('input').value)}
-  else if(t.dataset.a==='drs'){dupSet(t.closest('tr').dataset.r,'')}
+  else if(t.dataset.a==='dsv'){const tr=t.closest('[data-r]');dupSet(tr.dataset.r,tr.querySelector('input').value)}
+  else if(t.dataset.a==='drs'){dupSet(t.closest('[data-r]').dataset.r,'')}
+  else if(t.dataset.a==='dum'){dupSet(t.closest('[data-r]').dataset.r,'UMUM')}
+  else if(t.dataset.a==='dm'){S.dm=t.dataset.k;save();dupView()}
+  else if(t.dataset.a==='dgd'){S.dk[t.dataset.z]=1;S.dwz='';save();dupView()}
+  else if(t.dataset.a==='dnx'){S.dwz='';S.dwi++;dupView()}
+  else if(t.dataset.a==='dpv'){S.dwz='';S.dwi--;dupView()}
+  else if(t.dataset.a==='dre'){S.dk={};S.dwi=0;S.dwz='';save();dupView()}
  else if(t.dataset.a==='use'){applyDec(t.closest('tr').dataset.v,t.dataset.n)}
  else if(t.dataset.a==='sv'){const r=t.closest('.ed-row');applyDec(r.dataset.v,r.querySelector('input').value)}
  else if(t.dataset.a==='all'||t.dataset.a==='none'){hdr.forEach((h,c)=>{if(c)S.sel[c]=t.dataset.a==='all'});save();view()}
